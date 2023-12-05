@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Bird Selection</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <h2>Select a Bird Kind</h2>
+    <form action="/selected-pictures" method="post">
+        <label for="birdKind">Bird Kind:</label>
+        <select id="birdKind" name="birdKind">
+            <!-- Thymeleaf iteration -->
+            <option th:each="birdName : ${birdNames}" th:value="${birdName}" th:text="${birdName}"></option>
+        </select>
+        <br/>
+        <label for="selectedPictures">Select Pictures:</label>
+        <select id="selectedPictures" name="selectedPictures" multiple="multiple">
+        </select>
+        <br/>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
