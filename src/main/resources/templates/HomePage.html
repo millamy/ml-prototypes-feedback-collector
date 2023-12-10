@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Home Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    
+    <div th:replace="@{/fragments/Menu}::menu"> </div>
+
+    <section>
+        <!-- Content specific to the home page -->
+        <h2>Welcome to Our Website</h2>
+        <p>Explore and discover amazing things!</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2023 Your Website Name</p>
+    </footer>
+</body>
+</html>

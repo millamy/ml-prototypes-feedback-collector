@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
 </head>
 <body>
+    <div th:replace="@{/fragments/Menu}::menu"> </div>
     <h2>Select a Bird Kind</h2>
     <form action="/selected-pictures" method="post">
         <label for="birdKind">Bird Kind:</label>
