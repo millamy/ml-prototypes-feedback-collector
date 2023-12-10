@@ -15,11 +15,50 @@
             <option th:each="birdName : ${birdNames}" th:value="${birdName}" th:text="${birdName}"></option>
         </select>
         <br/>
-        <label for="selectedPictures">Select Pictures:</label>
-        <select id="selectedPictures" name="selectedPictures" multiple="multiple">
-        </select>
-        <br/>
+        <div id="birdsImagesGrid"></div>
+        <input type="hidden" id="selectedImageUrl" name="selectedImageUrl" value="">
         <button type="submit">Submit</button>
     </form>
+
+    <script>
+        let selectedImage = null;
+
+        function loadBirdImages(birdName) {
+            fetch(`/images/${birdName}`)
+                .then(response => response.json())
+                .then(data => {
+                    const imageGrid = document.getElementById('birdsImagesGrid');
+                    imageGrid.innerHTML = '';
+
+                    data.forEach(url => {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.alt = 'Bird Image';
+                        img.classList.add('image-item');
+
+                        img.addEventListener('click', () => {
+                            if (selectedImage) {
+                                selectedImage.classList.remove('selected');
+                            }
+                            img.classList.add('selected');
+                            selectedImage = img;
+                            document.getElementById('selectedImageUrl').value = url;
+                        });
+
+                        imageGrid.appendChild(img);
+                    });
+                })
+                .catch(error => console.error('Error fetching images:', error));
+        }
+
+        document.getElementById('birdKind').addEventListener('change', function () {
+            loadBirdImages(this.value);
+        });
+
+        window.onload = () => {
+            const initialBirdName = document.getElementById('birdKind').value;
+            loadBirdImages(initialBirdName)
+        }
+    </script>
 </body>
 </html>
