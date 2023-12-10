@@ -1,4 +1,4 @@
-package protopnet.mlprototypesfeedbackcollector;
+package protopnet.mlprototypesfeedbackcollector.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +14,7 @@ public class ImageController {
     @GetMapping("/picture-selection")
     public String showBirdSelection(Model model) {
         File birdPictureFolder = new File(STATIC_IMAGES_PATH);
+
 
         if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
             String[] birdNames = birdPictureFolder.list();
