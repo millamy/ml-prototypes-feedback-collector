@@ -1,24 +1,37 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8"/>
     <title>Bird Selection</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" href="/css/style.css"/>
 </head>
 <body>
-    <div th:replace="@{/fragments/Menu}::menu"> </div>
-    <h2>Select a Bird Kind</h2>
-    <form action="/selected-pictures" method="post">
-        <label for="birdKind">Bird Kind:</label>
-        <select id="birdKind" name="birdKind">
-            <!-- Thymeleaf iteration -->
-            <option th:each="birdName : ${birdNames}" th:value="${birdName}" th:text="${birdName}"></option>
-        </select>
-        <br/>
-        <div id="birdsImagesGrid"></div>
-        <input type="hidden" id="selectedImageUrl" name="selectedImageUrl" value="">
-        <button type="submit">Submit</button>
-    </form>
+
+<div class="header">
+    <nav>
+        <ul>
+            <div class="white-box-header"><a href="/home">Home</a></div>
+            <div class="white-box-header"><a href="/about-us">About Us</a></div>
+        </ul>
+    </nav>
+</div>
+
+<div class="content-container">
+    <div class="white-box">
+        <h2>Please select a bird kind</h2>
+        <form action="/selected-pictures" method="post">
+            <label for="birdKind">Available bird kinds:</label>
+            <select id="birdKind" name="birdKind">
+                <!-- Thymeleaf iteration -->
+                <option th:each="birdName : ${birdNames}" th:value="${birdName}" th:text="${birdName}"></option>
+            </select>
+            <br/>
+            <div id="birdsImagesGrid" class="image-grid"></div>
+            <input type="hidden" id="selectedImageUrl" name="selectedImageUrl" value="">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
 
     <script>
         let selectedImage = null;
