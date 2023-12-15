@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8"/>
     <title>Registration Page</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" href="/css/style.css"/>
 </head>
 <body>
-    <div th:replace="@{/fragments/Menu}::menu"> </div>
     <div class="register-container">
         <h2>Register</h2>
         <form action="/register" method="post">
@@ -24,7 +23,7 @@
             <br/>
             <button type="submit">Register</button>
         </form>
-        <p>Already have an account? <a th:href="@{/login}">Login</a></p>
+        <p>Already have an account? <a href="/login">Login</a></p>
     </div>
 </body>
 </html>
