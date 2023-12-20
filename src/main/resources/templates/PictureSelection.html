@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <title>Bird Selection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="/css/style.css"/>
 </head>
 <body>
@@ -33,11 +34,18 @@
     </div>
 </div>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const birdToFolder = /*[[${nameToFolderMap}]]*/ {};
+    /*]]>*/
+</script>
+
     <script>
-        let selectedImage = null;
+        let selectedImages = [];
 
         function loadBirdImages(birdName) {
-            fetch(`/images/${birdName}`)
+            let folderName = birdToFolder[birdName]
+            fetch(`/images/${folderName}`)
                 .then(response => response.json())
                 .then(data => {
                     const imageGrid = document.getElementById('birdsImagesGrid');
@@ -50,18 +58,25 @@
                         img.classList.add('image-item');
 
                         img.addEventListener('click', () => {
-                            if (selectedImage) {
-                                selectedImage.classList.remove('selected');
+                            if (selectedImages.includes(img)) {
+                                img.classList.remove('selected');
+                                selectedImages = selectedImages.filter(selected => selected !== img);
+                            } else {
+                                img.classList.add('selected');
+                                selectedImages.push(img);
                             }
-                            img.classList.add('selected');
-                            selectedImage = img;
-                            document.getElementById('selectedImageUrl').value = url;
+                            updateSelectedImagesInput();
                         });
 
                         imageGrid.appendChild(img);
                     });
                 })
                 .catch(error => console.error('Error fetching images:', error));
+        }
+
+        function updateSelectedImagesInput() {
+            const selectedUrls = selectedImages.map(img => img.src);
+            document.getElementById('selectedImageUrl').value = selectedUrls.join(';');
         }
 
         document.getElementById('birdKind').addEventListener('change', function () {
