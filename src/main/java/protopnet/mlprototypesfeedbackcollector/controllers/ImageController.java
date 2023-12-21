@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class ImageController {
@@ -20,11 +18,24 @@ public class ImageController {
     @GetMapping("/picture-selection")
     public String showBirdSelection(Model model) {
         File birdPictureFolder = new File(STATIC_IMAGES_PATH);
-
+        Map<String, String> birdToFolder = new HashMap<>();
 
         if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
             String[] birdNames = birdPictureFolder.list();
-            model.addAttribute("birdNames", Arrays.asList(Objects.requireNonNull(birdNames)));
+
+            if (birdNames != null) {
+                List<String> processedBirdNames = Arrays.stream(birdNames)
+                        .map(name -> {
+                            String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
+                            birdToFolder.put(processedName, name);
+                            return processedName;
+                        })
+                        .sorted()
+                        .collect(Collectors.toList());
+
+                model.addAttribute("birdNames", processedBirdNames);
+                model.addAttribute("nameToFolderMap", birdToFolder);
+            }
         }
         return "PictureSelection";
     }
