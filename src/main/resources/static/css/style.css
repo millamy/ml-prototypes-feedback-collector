@@ -315,3 +315,40 @@ select:focus {
     margin: -18px 10px 0 10px; /* space between header buttons */
     display: inline-block;
 }
+/*result page*/
+.results-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-right: 100px;
+}
+
+.analysis-box {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #4CAF50;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin-right: 30%
+}
+
+.title {
+    font-size: 20px;
+}
+.image-info {
+    font-size: 18px;
+}
+
+.scrollable-table {
+    max-height: 700px;
+    width: 650px;
+    overflow-y: auto;
+}
