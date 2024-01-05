@@ -42,6 +42,7 @@
 
     <script>
         let selectedImages = [];
+        const maxSelectedImages = 3;
 
         function loadBirdImages(birdName) {
             let folderName = birdToFolder[birdName]
@@ -62,8 +63,13 @@
                                 img.classList.remove('selected');
                                 selectedImages = selectedImages.filter(selected => selected !== img);
                             } else {
-                                img.classList.add('selected');
-                                selectedImages.push(img);
+                                if (selectedImages.length < maxSelectedImages) {
+                                    img.classList.add('selected');
+                                    selectedImages.push(img);
+                                }else {
+                                    alert('You can only select up to 3 bird pictures.');
+                                }
+
                             }
                             updateSelectedImagesInput();
                         });
