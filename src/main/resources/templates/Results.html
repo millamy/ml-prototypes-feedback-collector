@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Analysis Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+</head>
+<body>
+<div class="header">
+    <nav>
+        <ul>
+            <div class="white-box-header"><a href="/home">Home</a></div>
+            <div class="white-box-header"><a href="/about-us">About Us</a></div>
+        </ul>
+    </nav>
+</div>
+<div class="results-container">
+    <div class="analysis-box">
+        <h1 class="title">Analysis Results</h1>
+
+        <p class="image-info">Original Image Class: <span th:text="${birdNames[originalImgclass - 1]}"></span></p>
+        <!--    Uncomment if needed-->
+        <!--    <p>Image Directory: <span th:text="${imgdir}"></span></p>-->
+        <!--    <p>Image Name: <span th:text="${img}"></span></p>-->
+
+        <p class="image-info">Predicted Class: <span th:text="${birdNames[predictedClass]}"></span></p>
+    </div>
+</div>
+
+<div class="center-container">
+    <div class="white-box">
+        <h2>Top 10 Most Activated Prototypes</h2>
+        <div class="scrollable-table">
+            <table border="1">
+                <thead>
+                <tr>
+                    <th style="width:35%">Original Image</th>
+                    <th style="width:35%">Prototype Image</th>
+                    <th style="width:30%">Correctness</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="index : ${#numbers.sequence(1, 10)}">
+                    <td>
+                        <img th:src="@{'/bird_pictures/' + ${imgdir} + '/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/prototype_activation_map_by_top-' + ${index} + '_prototype.png'}"
+                             alt="Prototype Image"/>
+                    </td>
+                    <td>
+                        <img th:src="@{'/bird_pictures/' + ${imgdir} + '/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-' + ${index} + '_activated_prototype_self_act.png'}"
+                             alt="Prototype Image"/>
+                    </td>
+                    <td>
+                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"/> Yes</label>
+                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/> No</label>
+                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk"/> I don't
+                            know</label>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Display any errors -->
+<p style="color: red;" th:text="${error}"></p>
+</body>
+</html>
+
+
