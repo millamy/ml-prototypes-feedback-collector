@@ -41,13 +41,17 @@ public class WebSecurityConfig {
                                                 form -> form
                                                                 .loginPage("/login")
                                                                 .loginProcessingUrl("/login")
-                                                                .defaultSuccessUrl("/home")
+                                                                .defaultSuccessUrl("/home", true)
                                                                 .failureUrl("/login?error")
-                                                                .permitAll());
+                                                                .permitAll())
+                                .logout(logout -> logout
+                                                .logoutUrl("/logout")
+                                                .logoutSuccessUrl("/")
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID"));
+                ;
 
                 return http.build();
         }
-
-        
 
 }
