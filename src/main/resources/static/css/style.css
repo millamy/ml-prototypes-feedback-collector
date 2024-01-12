@@ -299,6 +299,7 @@ select:focus {
     left: 0;
     color: #fff;
     margin-bottom: 30px;
+    width: 100%; 
 }
 
 .header a {
@@ -315,6 +316,13 @@ select:focus {
     margin: -18px 10px 0 10px; /* space between header buttons */
     display: inline-block;
 }
+
+.sign-out {
+    float: right;
+}
+
+
+
 /*result page*/
 .results-container {
     display: flex;

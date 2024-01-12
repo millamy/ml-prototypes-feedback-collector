@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/register")
-public class RegistrationController {
+public class RegisterController {
 
     private final UserService userService;
 
     @Autowired
-    public RegistrationController(UserService userService) {
+    public RegisterController(UserService userService) {
         this.userService = userService;
     }
 
@@ -28,8 +28,14 @@ public class RegistrationController {
 
     @PostMapping
     public String registerUser(User user) {
+        User existingUser = userService.findByUsername(user.getUsername());
+        if (existingUser != null) {
+            return "redirect:/register?usernameTaken";
+        }
+
+
         userService.registerUser(user);
-        return "redirect:/login";
+        return "redirect:/login?regisrationSuccess";
     }
 
 }
