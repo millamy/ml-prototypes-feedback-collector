@@ -1,22 +1,50 @@
 package protopnet.mlprototypesfeedbackcollector.controllers;
 
-import jakarta.servlet.http.HttpSession;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ImageController {
-    private static final String STATIC_IMAGES_PATH = "src/main/resources/static/bird_pictures/";
+
+
+    @Value("${local_analysis.static.path}")
+    private String LOCAL_ANALYSIS_PATH;
+
+    @Value("${modeldir.static.path}")
+    private String MODELDIR_PATH;
+
+    @Value("${model.static.path}")
+    private String MODEL_PATH;
+
+    @Value("${images_direct.static.path}")
+    private String STATIC_IMAGES_PATH;
 
     @GetMapping("/picture-selection")
     public String showBirdSelection(Model model, HttpSession session) {
@@ -45,28 +73,14 @@ public class ImageController {
         return "PictureSelection";
     }
 
-    @GetMapping("/images/{birdName}")
-    @ResponseBody
-    public ResponseEntity<List<String>> getBirdImages(@PathVariable String birdName) {
-        File birdFolder = new File(STATIC_IMAGES_PATH + birdName);
-        List<String> imageUrls = new ArrayList<>();
 
-        if (birdFolder.exists() && birdFolder.isDirectory()) {
-            File[] birdImages = birdFolder.listFiles();
-            if (birdImages != null) {
-                for (File file : birdImages) {
-                    if (file.isFile()) {
-                        imageUrls.add("bird_pictures/" + birdName + "/" + file.getName());
-                    }
-                }
-            }
-        }
-        return ResponseEntity.ok(imageUrls);
-    }
-
+    //Connecting with model
     @PostMapping("/selected-pictures")
-    public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind, Model model, HttpSession session) {
+    public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind,
+            Model model, HttpSession session) {
         String[] imageUrls = selectedImageUrl.split(";");
+
+    
 
         // TO DO: Analyze each image separately
         for (String imageUrl : imageUrls) {
@@ -77,9 +91,9 @@ public class ImageController {
             String imgdir = parts[parts.length - 2];
             String img = parts[parts.length - 1];
 
-            //IMPORTANT: Change the paths accordingly !!!
-            String analysisCommand = "python C:\\Users\\User\\Downloads\\ProtoPNet\\local_analysis.py  -modeldir C:\\Users\\User\\Downloads\\ProtoPNet\\saved_models\\vgg19\\001 " +
-                    "-model ./100_0push0.7411.pth -imgdir C:\\Users\\User\\IdeaProjects\\ml-prototypes-feedback-collector\\resources\\static\\bird_pictures\\"
+           
+            String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH +
+                    " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH
                     + imgdir + " -img " + img + " -imgclass " + imgclass;
 
             try {
@@ -108,8 +122,8 @@ public class ImageController {
                     prototypeMap.put("classIdentity", prototypeInfo[1].trim());
                     prototypes.add(prototypeMap);
 
-//                Uncomment to get output to the terminal
-//                System.out.println(output);
+                    // Uncomment to get output to the terminal
+                    // System.out.println(output);
                     List<String> birdNames = (List<String>) session.getAttribute("birdNames");
 
                     model.addAttribute("birdNames", birdNames);
@@ -131,4 +145,80 @@ public class ImageController {
         }
         return "Results";
     }
+
+    
+    //Fetching images
+
+    @GetMapping("/images/{folderName}")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, String>>> getBirdImages(@PathVariable String folderName) {
+        
+
+       
+            List<Map<String, String>> imageDatas = new ArrayList<>();
+            File birdFolder = new File(STATIC_IMAGES_PATH + folderName);
+
+            if (birdFolder.exists() && birdFolder.isDirectory()) {
+                File[] birdImages = birdFolder.listFiles();
+                if (birdImages != null) {
+                    for (File file : birdImages) {
+                        if (file.isFile()) {
+                            try {
+                                byte[] imageData = Files.readAllBytes(file.toPath());
+                                String base64Image = Base64.getEncoder().encodeToString(imageData);
+
+                                
+                                Map<String, String> imageDataMap = new HashMap<>();
+                                imageDataMap.put("imageData", base64Image);
+                                imageDataMap.put("folderPath", folderName+"/"+file.getName());
+
+                                imageDatas.add(imageDataMap);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                return ResponseEntity.ok(imageDatas);
+            }
+
+            
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/results_images/{imgdir}/{index}/{type}")
+    public ResponseEntity<byte[]> getGeneratedImage(
+            @PathVariable String imgdir,
+            @PathVariable String index,
+            @PathVariable String type) {
+
+        String filePath;
+
+        if (type.equals("prototype")) {
+            filePath = STATIC_IMAGES_PATH
+                    + imgdir
+                    + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/prototype_activation_map_by_top-"
+                    + index + "_prototype.png";
+        } else {
+            filePath = STATIC_IMAGES_PATH
+                    +
+                    imgdir + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-" + index
+                    + "_activated_prototype_self_act.png";
+        }
+
+        try {
+            Path path = Paths.get(filePath);
+            byte[] imageData = Files.readAllBytes(path);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+
+            return new ResponseEntity<>(imageData, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

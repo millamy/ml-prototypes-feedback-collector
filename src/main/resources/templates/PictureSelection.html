@@ -40,59 +40,90 @@
     /*]]>*/
 </script>
 
-    <script>
-        let selectedImages = [];
-        const maxSelectedImages = 3;
+<script>
+    let selectedImages = [];
+const maxSelectedImages = 3;
 
-        function loadBirdImages(birdName) {
-            let folderName = birdToFolder[birdName]
-            fetch(`/images/${folderName}`)
-                .then(response => response.json())
-                .then(data => {
-                    const imageGrid = document.getElementById('birdsImagesGrid');
-                    imageGrid.innerHTML = '';
+function loadBirdImages(birdName) {
+    let folderName = birdToFolder[birdName];
+    fetch(`/images/${folderName}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Received data:', data);
 
-                    data.forEach(url => {
-                        const img = document.createElement('img');
-                        img.src = url;
-                        img.alt = 'Bird Image';
-                        img.classList.add('image-item');
+            const imageGrid = document.getElementById('birdsImagesGrid');
+            imageGrid.innerHTML = '';
 
-                        img.addEventListener('click', () => {
-                            if (selectedImages.includes(img)) {
-                                img.classList.remove('selected');
-                                selectedImages = selectedImages.filter(selected => selected !== img);
-                            } else {
-                                if (selectedImages.length < maxSelectedImages) {
-                                    img.classList.add('selected');
-                                    selectedImages.push(img);
-                                }else {
-                                    alert('You can only select up to 3 bird pictures.');
-                                }
+            data.forEach(record => {
+                const blob = base64ToBlob(record.imageData);
+                const imgUrl = URL.createObjectURL(blob);
 
-                            }
-                            updateSelectedImagesInput();
-                        });
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = 'Bird Image';
+                img.classList.add('image-item');
 
-                        imageGrid.appendChild(img);
-                    });
-                })
-                .catch(error => console.error('Error fetching images:', error));
+                img.addEventListener('click', () => {
+                    if (selectedImages.includes(record.folderPath)) {
+                        console.log('Removing from selectedImages:', record.folderPath);
+        
+                        img.classList.remove('selected');
+                        selectedImages = selectedImages.filter(selected => selected !== record.folderPath);
+                    } else {
+                        console.log('Adding to selectedImages:', record.folderPath);
+        
+                        if (selectedImages.length < maxSelectedImages) {
+                            img.classList.add('selected');
+                            selectedImages.push(record.folderPath);
+                        } else {
+                            alert('You can only select up to 3 bird pictures.');
+                        }
+                    }
+                    updateSelectedImagesInput();
+                });
+
+                imageGrid.appendChild(img);
+            });
+        })
+        .catch(error => console.error('Error fetching images:', error));
+}
+
+function updateSelectedImagesInput() {
+    console.log('Selected images:', selectedImages);
+
+    const selectedUrls = selectedImages.map(imagePath => `/images/${imagePath}`);
+    document.getElementById('selectedImageUrl').value = selectedUrls.join(';');
+    console.log('Updated selectedImageUrl:', document.getElementById('selectedImageUrl').value);
+}
+
+    function base64ToBlob(base64Data) {
+        const sliceSize = 512;
+        const byteCharacters = atob(base64Data);
+        const byteArrays = [];
+
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
         }
 
-        function updateSelectedImagesInput() {
-            const selectedUrls = selectedImages.map(img => img.src);
-            document.getElementById('selectedImageUrl').value = selectedUrls.join(';');
-        }
+        return new Blob(byteArrays, { type: 'image/jpeg' });
+    }
 
-        document.getElementById('birdKind').addEventListener('change', function () {
-            loadBirdImages(this.value);
-        });
+    document.getElementById('birdKind').addEventListener('change', function () {
+        loadBirdImages(this.value);
+    });
 
-        window.onload = () => {
-            const initialBirdName = document.getElementById('birdKind').value;
-            loadBirdImages(initialBirdName)
-        }
-    </script>
+    window.onload = () => {
+        const initialBirdName = document.getElementById('birdKind').value;
+        loadBirdImages(initialBirdName);
+    }
+</script>
 </body>
 </html>
