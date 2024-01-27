@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Comparator; 
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -53,6 +54,13 @@ public class ImageController {
 
         if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
             String[] birdNames = birdPictureFolder.list();
+            Arrays.sort(birdNames, Comparator.comparingInt(name -> Integer.parseInt(name.substring(0, 3))));
+
+            //print out birdNames
+            // for (String birdName : birdNames) {
+            //     System.out.println(birdName);
+            // }
+
 
             if (birdNames != null) {
                 List<String> processedBirdNames = Arrays.stream(birdNames)
@@ -63,14 +71,31 @@ public class ImageController {
                         })
                         .sorted()
                         .collect(Collectors.toList());
+                        
 
                 model.addAttribute("birdNames", processedBirdNames);
                 model.addAttribute("nameToFolderMap", birdToFolder);
 
+                //print out processedBirdNames
+                // for (String processedBirdName : processedBirdNames) {
+                //     System.out.println(processedBirdName);
+                // }
+
+
                 session.setAttribute("birdNames", processedBirdNames);
+                session.setAttribute("folderNames", birdNames);
             }
         }
         return "PictureSelection";
+    }
+
+    private List<String> getBirdProcessedNames(String[] birdNames) {
+        return Arrays.stream(birdNames)
+                        .map(name -> {
+                            String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
+                            return processedName;
+                        })
+                        .collect(Collectors.toList());
     }
 
 
@@ -79,6 +104,8 @@ public class ImageController {
     public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind,
             Model model, HttpSession session) {
         String[] imageUrls = selectedImageUrl.split(";");
+
+        //System.out.println("\n\n\n\nselectedImageUrl: " + selectedImageUrl + "\n\n");
 
     
 
@@ -91,8 +118,10 @@ public class ImageController {
             String imgdir = parts[parts.length - 2];
             String img = parts[parts.length - 1];
 
+            // System.out.println("imgclassStr: " + imgclassStr + "\norignalImgclass: " + originalImgclass
+            //         + "\nimgclass: " + imgclass + "\nimgdir: " + imgdir + "\nimg: " + img + "\n\n");
            
-            String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH +
+             String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH +
                     " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH
                     + imgdir + " -img " + img + " -imgclass " + imgclass;
 
@@ -123,10 +152,10 @@ public class ImageController {
                     prototypes.add(prototypeMap);
 
                     // Uncomment to get output to the terminal
-                    // System.out.println(output);
-                    List<String> birdNames = (List<String>) session.getAttribute("birdNames");
+                    //System.out.println(output + "\n\n");
+                    String[] birdNames = (String[])session.getAttribute("folderNames");
 
-                    model.addAttribute("birdNames", birdNames);
+                    model.addAttribute("birdNames", getBirdProcessedNames(birdNames));
                     model.addAttribute("predictedClass", Integer.parseInt(prototypeInfo[1].trim()));
                     model.addAttribute("analysisResults", output.toString());
                     model.addAttribute("originalImgclass", originalImgclass);
