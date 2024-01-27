@@ -42,14 +42,18 @@
                 </thead>
                 <tbody>
                 <tr th:each="index : ${#numbers.sequence(1, 10)}">
+
                     <td>
-                        <img th:src="@{'/bird_pictures/' + ${imgdir} + '/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/prototype_activation_map_by_top-' + ${index} + '_prototype.png'}"
+                        <img th:src="@{'/results_images/' + ${imgdir} + '/' + ${index}} + '/prototype'"
                              alt="Prototype Image"/>
                     </td>
                     <td>
-                        <img th:src="@{'/bird_pictures/' + ${imgdir} + '/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-' + ${index} + '_activated_prototype_self_act.png'}"
+                        <img th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}"
                              alt="Prototype Image"/>
                     </td>
+
+
+
                     <td>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"/> Yes</label>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/> No</label>
