@@ -54,7 +54,13 @@ public class ImageController {
 
         if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
             String[] birdNames = birdPictureFolder.list();
-            Arrays.sort(birdNames, Comparator.comparingInt(name -> Integer.parseInt(name.substring(0, 3))));
+            if (birdNames != null) {
+                birdNames = Arrays.stream(birdNames)
+                        .filter(name -> name.matches("\\d{3}.*"))
+                        .toArray(String[]::new);
+
+                Arrays.sort(birdNames, Comparator.comparingInt(name -> Integer.parseInt(name.substring(0, 3))));
+            }
 
             //print out birdNames
             // for (String birdName : birdNames) {
@@ -107,11 +113,14 @@ public class ImageController {
 
         //System.out.println("\n\n\n\nselectedImageUrl: " + selectedImageUrl + "\n\n");
 
-    
+        Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
+        if (currentImageIndex == null) {
+            currentImageIndex = 0;
+        }
 
-        // TO DO: Analyze each image separately
-        for (String imageUrl : imageUrls) {
-            String[] parts = selectedImageUrl.split("/");
+        if (currentImageIndex < imageUrls.length) {
+            String imageUrl = imageUrls[currentImageIndex];
+            String[] parts = imageUrl.split("/");
             String imgclassStr = parts[parts.length - 2].substring(0, 3);
             int originalImgclass = Integer.parseInt(imgclassStr);
             int imgclass = originalImgclass - 1;
@@ -125,10 +134,22 @@ public class ImageController {
                     " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH
                     + imgdir + " -img " + img + " -imgclass " + imgclass;
 
-            try {
-                ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
-                builder.redirectErrorStream(true);
-                Process process = builder.start();
+        ProcessBuilder builder;
+
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
+        } else {
+            builder = new ProcessBuilder("python3", LOCAL_ANALYSIS_PATH,
+                    "-modeldir", MODELDIR_PATH,
+                    "-model", MODEL_PATH,
+                    "-imgdir", STATIC_IMAGES_PATH + imgdir,
+                    "-img", img,
+                    "-imgclass", String.valueOf(imgclass));
+        }
+
+        try {
+            builder.redirectErrorStream(true);
+            Process process = builder.start();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 StringBuilder output = new StringBuilder();
@@ -171,11 +192,30 @@ public class ImageController {
                 model.addAttribute("error", "Error executing the analysis command: " + e.getMessage());
                 return "Results";
             }
-        }
-        return "Results";
+        session.setAttribute("currentImageIndex", currentImageIndex);
+        session.setAttribute("selectedImageUrls", selectedImageUrl);
+    } else {
+        session.removeAttribute("currentImageIndex");
+        session.removeAttribute("selectedImageUrls");
+        return "redirect:/picture-selection";
     }
 
-    
+        return "Results";
+}
+
+    @GetMapping("/analyze-next")
+    public String analyzeNextImage(HttpSession session, Model model) {
+        Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
+        String selectedImageUrls = (String) session.getAttribute("selectedImageUrls");
+
+        if (currentImageIndex != null && selectedImageUrls != null) {
+            session.setAttribute("currentImageIndex", currentImageIndex + 1);
+            return analyzeSelectedPictures(selectedImageUrls, null, model, session);
+        } else {
+            return "redirect:/picture-selection";
+        }
+    }
+
     //Fetching images
 
     @GetMapping("/images/{folderName}")
