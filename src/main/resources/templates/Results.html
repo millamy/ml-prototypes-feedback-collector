@@ -18,13 +18,14 @@
 <div class="results-container">
     <div class="analysis-box">
         <h1 class="title">Analysis Results</h1>
-
+        <div th:if="${birdNames != null}">
         <p class="image-info">Original Image Class: <span th:text="${birdNames[originalImgclass - 1]}"></span></p>
         <!--    Uncomment if needed-->
         <!--    <p>Image Directory: <span th:text="${imgdir}"></span></p>-->
         <!--    <p>Image Name: <span th:text="${img}"></span></p>-->
 
         <p class="image-info">Predicted Class: <span th:text="${birdNames[predictedClass]}"></span></p>
+        </div>
     </div>
 </div>
 
@@ -64,6 +65,9 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="next-button">
+        <a class="action-button" href="/analyze-next">Next</a>
     </div>
 </div>
 

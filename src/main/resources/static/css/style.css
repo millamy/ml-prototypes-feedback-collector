@@ -360,3 +360,7 @@ select:focus {
     width: 650px;
     overflow-y: auto;
 }
+
+.next-button {
+    margin-left: 100px;
+}
