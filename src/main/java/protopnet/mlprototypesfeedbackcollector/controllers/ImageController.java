@@ -34,7 +34,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class ImageController {
 
-
+// Set and change in application.properties
     @Value("${local_analysis.static.path}")
     private String LOCAL_ANALYSIS_PATH;
 
@@ -62,11 +62,6 @@ public class ImageController {
                 Arrays.sort(birdNames, Comparator.comparingInt(name -> Integer.parseInt(name.substring(0, 3))));
             }
 
-            //print out birdNames
-            // for (String birdName : birdNames) {
-            //     System.out.println(birdName);
-            // }
-
 
             if (birdNames != null) {
                 List<String> processedBirdNames = Arrays.stream(birdNames)
@@ -81,11 +76,6 @@ public class ImageController {
 
                 model.addAttribute("birdNames", processedBirdNames);
                 model.addAttribute("nameToFolderMap", birdToFolder);
-
-                //print out processedBirdNames
-                // for (String processedBirdName : processedBirdNames) {
-                //     System.out.println(processedBirdName);
-                // }
 
 
                 session.setAttribute("birdNames", processedBirdNames);
@@ -111,7 +101,6 @@ public class ImageController {
             Model model, HttpSession session) {
         String[] imageUrls = selectedImageUrl.split(";");
 
-        //System.out.println("\n\n\n\nselectedImageUrl: " + selectedImageUrl + "\n\n");
 
         Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
         if (currentImageIndex == null) {
