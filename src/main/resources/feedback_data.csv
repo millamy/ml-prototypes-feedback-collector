@@ -1,0 +1,13 @@
+username, imageClass, predictedImageClass, originalImagePath, prototypeImagePath, correctness
+
+nina,Acadian Flycatcher,Acadian Flycatcher,/results_images/037.Acadian_Flycatcher/1/prototype,/results_images/037.Acadian_Flycatcher/1/activated,no
+nina,Acadian Flycatcher,Acadian Flycatcher,/results_images/037.Acadian_Flycatcher/2/prototype,/results_images/037.Acadian_Flycatcher/2/activated,no
+nina,Acadian Flycatcher,Acadian Flycatcher,/results_images/037.Acadian_Flycatcher/3/prototype,/results_images/037.Acadian_Flycatcher/3/activated,yes
+nina,Acadian Flycatcher,Acadian Flycatcher,/results_images/037.Acadian_Flycatcher/1/prototype,/results_images/037.Acadian_Flycatcher/1/activated,no
+nina,Acadian Flycatcher,Acadian Flycatcher,/results_images/037.Acadian_Flycatcher/2/prototype,/results_images/037.Acadian_Flycatcher/2/activated,idk
+nina,Acadian Flycatcher,Acadian Flycatcher,/results_images/037.Acadian_Flycatcher/3/prototype,/results_images/037.Acadian_Flycatcher/3/activated,yes
+nina,Black Tern,Black Tern,/results_images/142.Black_Tern/1/prototype,/results_images/142.Black_Tern/1/activated,idk
+nina,Black Tern,Black Tern,/results_images/142.Black_Tern/2/prototype,/results_images/142.Black_Tern/2/activated,idk
+nina,Black Tern,Black Tern,/results_images/142.Black_Tern/3/prototype,/results_images/142.Black_Tern/3/activated,idk
+nina,Black Tern,Black Tern,/results_images/142.Black_Tern/4/prototype,/results_images/142.Black_Tern/4/activated,no
+nina,Black Tern,Black Tern,/results_images/142.Black_Tern/5/prototype,/results_images/142.Black_Tern/5/activated,yes
