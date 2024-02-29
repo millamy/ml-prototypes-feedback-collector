@@ -19,12 +19,8 @@
     <div class="analysis-box">
         <h1 class="title">Analysis Results</h1>
         <div th:if="${birdNames != null}">
-        <p class="image-info">Original Image Class: <span th:text="${birdNames[originalImgclass - 1]}"></span></p>
-        <!--    Uncomment if needed-->
-        <!--    <p>Image Directory: <span th:text="${imgdir}"></span></p>-->
-        <!--    <p>Image Name: <span th:text="${img}"></span></p>-->
-
-        <p class="image-info">Predicted Class: <span th:text="${birdNames[predictedClass]}"></span></p>
+            <p class="image-info">Original Image Class: <span id="originalImageClass" th:text="${birdNames[originalImgclass - 1]}"></span></p>
+            <p class="image-info">Predicted Class: <span id="predictedImageClass" th:text="${birdNames[predictedClass]}"></span></p>
         </div>
     </div>
 </div>
@@ -43,36 +39,82 @@
                 </thead>
                 <tbody>
                 <tr th:each="index : ${#numbers.sequence(1, 10)}">
-
                     <td>
-                        <img th:src="@{'/results_images/' + ${imgdir} + '/' + ${index}} + '/prototype'"
-                             alt="Prototype Image"/>
+                        <img class="originalImagePath" th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/prototype'}" alt="Original Image"/>
                     </td>
                     <td>
-                        <img th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}"
-                             alt="Prototype Image"/>
+                        <img class="prototypeImagePath" th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}" alt="Prototype Image"/>
                     </td>
-
-
-
                     <td>
-                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"/> Yes</label>
+                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"  /> Yes</label>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/> No</label>
-                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk"/> I don't
-                            know</label>
+                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk" /> I don't know</label>
                     </td>
+
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
     <div class="next-button">
-        <a class="action-button" href="/analyze-next">Next</a>
+        <a class="action-button" href="#" onclick="saveFeedbackAndRedirect()" >Save & Continue</a>
     </div>
 </div>
 
 <!-- Display any errors -->
 <p style="color: red;" th:text="${error}"></p>
+
+<script>
+    function saveFeedback() {
+        var feedbackDataArray = [];
+
+        // Collect feedback data from radio buttons
+        for (var index = 1; index <= 10; index++) {
+            var selectedValue = document.querySelector('input[name="correctness_' + index + '"]:checked');
+            if (selectedValue) {
+                var feedbackData = {};
+                feedbackData['imageClass'] = document.getElementById("originalImageClass").innerText;
+                feedbackData['predictedImageClass'] = document.getElementById("predictedImageClass").innerText;
+                feedbackData['originalImagePath'] = document.getElementsByClassName("originalImagePath")[index-1].getAttribute("src");
+                feedbackData['prototypeImagePath'] = document.getElementsByClassName("prototypeImagePath")[index-1].getAttribute("src");
+                feedbackData['correctness'] = selectedValue.value;
+                feedbackDataArray.push(feedbackData);
+            }
+        }
+        console.log(feedbackDataArray);
+
+        var feedbackDataJson = JSON.stringify(feedbackDataArray);
+        var responseClone;
+        fetch('http://localhost:8080/save-feedback', {
+            method: 'PUT',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: feedbackDataJson
+        })
+            .then(function (response) {
+                responseClone = response.clone();
+                return response.json();
+            })
+            .then(function (data) {
+                console.log('Success:', data);
+            }, function (rejectionReason) {
+                console.log('Error parsing JSON from response:', rejectionReason, responseClone);
+                responseClone.text()
+                    .then(function (bodyText) {
+                        console.log('Received the following instead of valid JSON:', bodyText);
+                    });
+            });
+
+    }
+
+    function saveFeedbackAndRedirect() {
+        saveFeedback();
+        window.location.href = "/analyze-next";
+    }
+
+</script>
+
 </body>
 </html>
 

@@ -80,6 +80,8 @@ body {
 .login-container {
     background-color: #ffffff;
     padding: 20px;
+    width: 400px;
+    margin: auto;
     border-radius: 8px;
     text-align: center;
 }
@@ -100,7 +102,7 @@ body {
 
 .login-container input {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -194,6 +196,7 @@ body {
     padding: 10px;
     border-radius: 8px;
     text-align: center;
+    justify-content: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -362,5 +365,8 @@ select:focus {
 }
 
 .next-button {
-    margin-left: 100px;
+    font-size: 40px;
+    padding: 10px 20px;
+    white-space: nowrap;
+    margin-right: -250px;
 }
