@@ -1,5 +1,7 @@
 package protopnet.mlprototypesfeedbackcollector.controllers;
 
+import org.bson.types.Binary;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,10 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import protopnet.mlprototypesfeedbackcollector.model.FeedbackData;
+import protopnet.mlprototypesfeedbackcollector.service.FeedbackService;
+import protopnet.mlprototypesfeedbackcollector.util.ImageUtil;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,30 +21,32 @@ import java.util.Map;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class FeedbackController {
 
-    @Value("${feedback_csv.static.path}")
-    private String CSV_FILE_PATH;
+    @Value("${images_direct.static.path}")
+    private String STATIC_IMAGES_PATH;
+    private final FeedbackService feedbackService;
+
+    @Autowired
+    public FeedbackController(FeedbackService feedbackService) {
+        this.feedbackService = feedbackService;
+    }
 
     @PutMapping("/save-feedback")
-    public ResponseEntity<Map<String, Object>> saveFeedback(@RequestBody List<FeedbackData> feedbackDataList) {
-        try (FileWriter writer = new FileWriter(CSV_FILE_PATH, true)) {
+    public ResponseEntity<Map<String, Object>> saveFeedback(@RequestBody List<FeedbackData> feedbackList) {
+        try {
+            for (FeedbackData feedback : feedbackList) {
+                feedback.setUsername(currentUserName());
+                feedback.setOriginalImage(ImageUtil.convertImageToBinary(STATIC_IMAGES_PATH + feedback.getOriginalImagePath()));
+                feedback.setPrototypeImage(ImageUtil.convertImageToBinary(STATIC_IMAGES_PATH + feedback.getPrototypeImagePath()));
+                feedbackService.saveFeedback(feedback);
 
-            File file = new File(CSV_FILE_PATH);
-            if (!file.exists()) {
-                file.createNewFile();
             }
 
-            // Append new data to CSV
-            for (FeedbackData feedbackData : feedbackDataList) {
-                writer.append(String.join(",", currentUserName(), feedbackData.toCsv()));
-                writer.append("\n");
-            }
-            writer.flush();
 
             // Return success
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             return ResponseEntity.ok(response);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             // Return error response
             Map<String, Object> response = new HashMap<>();
@@ -64,3 +67,4 @@ public class FeedbackController {
         }
     }
 }
+
