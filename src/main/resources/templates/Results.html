@@ -75,8 +75,20 @@
                 var feedbackData = {};
                 feedbackData['imageClass'] = document.getElementById("originalImageClass").innerText;
                 feedbackData['predictedImageClass'] = document.getElementById("predictedImageClass").innerText;
-                feedbackData['originalImagePath'] = document.getElementsByClassName("originalImagePath")[index-1].getAttribute("src");
-                feedbackData['prototypeImagePath'] = document.getElementsByClassName("prototypeImagePath")[index-1].getAttribute("src");
+                var thSrc = document.getElementsByClassName("originalImagePath")[index - 1].getAttribute("src");
+
+                let parts = thSrc.split("/");
+
+                let imgdir = parts[2]; // ex. "037.Acadian_Flycatcher"
+                let pathIndex = parts[3]; // ex. "1"
+
+                feedbackData['originalImagePath'] = imgdir +
+                    "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/prototype_activation_map_by_top-" +
+                    pathIndex + "_prototype.png";
+
+                feedbackData['prototypeImagePath'] = imgdir + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-" + pathIndex
+                    + "_activated_prototype_self_act.png";
+
                 feedbackData['correctness'] = selectedValue.value;
                 feedbackDataArray.push(feedbackData);
             }

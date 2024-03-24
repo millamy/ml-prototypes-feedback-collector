@@ -25,6 +25,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	compileOnly 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
+	implementation ('org.springframework.boot:spring-boot-starter-data-mongodb') {
+		exclude group: 'org.mongodb', module: 'mongodb-driver-core'
+	}
+	implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
 }
 
 tasks.named('test') {
