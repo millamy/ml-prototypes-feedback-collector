@@ -1,0 +1,372 @@
+#imageGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.image-item {
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.image-item:hover {
+    transform: scale(1.05);
+}
+
+.image-item.selected {
+    border: 2px solid #4CAF50;
+}
+
+/*background picture settings*/
+body {
+    background-image: url('Various-Birds-Clipart.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+/*main page settings*/
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.welcome-box {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 100px;
+}
+
+.welcome-box h2 {
+    color: #333333;
+}
+
+.welcome-box p {
+    color: #555555;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.action-button {
+    flex: 1;
+    padding: 10px;
+    margin: 0 10px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #45a049;
+}
+
+/*Login page*/
+
+.login-container {
+    background-color: #ffffff;
+    padding: 20px;
+    width: 400px;
+    margin: auto;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.login-container h2 {
+    color: #333333;
+}
+
+.login-container form {
+    margin-top: 20px;
+}
+
+.login-container label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555555;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.login-container button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+/*Register page*/
+
+.register-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.register-container h2 {
+    color: #333333;
+}
+
+.register-container form {
+    margin-top: 20px;
+}
+
+.register-container label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555555;
+}
+
+.register-container input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.register-container button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.register-container button:hover {
+    background-color: #45a049;
+}
+
+.register-container p {
+    color: #555555;
+}
+
+.register-container a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.register-container a:hover {
+    text-decoration: underline;
+}
+
+
+/*Bird selection*/
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+.content-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.white-box {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.white-box h2 {
+    color: #333333;
+}
+
+.white-box form {
+    margin-top: 20px;
+}
+
+.white-box label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555555;
+}
+
+.white-box select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.image-item {
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.white-box button {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.white-box button:hover {
+    background-color: #45a049;
+}
+
+.white-box p {
+    color: #555555;
+}
+
+.white-box a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.white-box a:hover {
+    text-decoration: underline;
+}
+
+select {
+    width: 100%;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f8f8f8;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Arrow indicator for select (using background image) */
+select {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-position: right 10px center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    padding-right: 30px;
+}
+
+select:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+/*Header*/
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    color: #fff;
+    margin-bottom: 30px;
+    width: 100%; 
+}
+
+.header a {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: #3498db;
+}
+
+.white-box-header {
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    margin: -18px 10px 0 10px; /* space between header buttons */
+    display: inline-block;
+}
+
+.sign-out {
+    float: right;
+}
+
+
+
+/*result page*/
+.results-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-right: 100px;
+}
+
+.analysis-box {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #4CAF50;
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin-right: 30%
+}
+
+.title {
+    font-size: 20px;
+}
+.image-info {
+    font-size: 18px;
+}
+
+.scrollable-table {
+    max-height: 700px;
+    width: 650px;
+    overflow-y: auto;
+}
+
+.next-button {
+    font-size: 40px;
+    padding: 10px 20px;
+    white-space: nowrap;
+    margin-right: -250px;
+}
