@@ -370,3 +370,9 @@ select:focus {
     white-space: nowrap;
     margin-right: -250px;
 }
+
+.error {
+    font-size: 18px;
+    padding: 10px 20px;
+    color: red;
+}

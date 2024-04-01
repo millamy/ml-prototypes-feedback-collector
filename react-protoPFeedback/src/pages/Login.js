@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
+import axios from 'axios';
 import '../style.css';
 
 function Login() {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,20 +16,19 @@ function Login() {
         formData.append('password', password);
 
         try {
-            const response = await fetch('http://localhost:8080/login', {
-                method: 'POST',
-                body: formData,
-                credentials: 'include',
+            const response = await axios({
+                method: 'post',
+                url: '/login',
+                data: formData,
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
-
-
-            if (response.redirected) {
+            if (response.status === 200) {
+                setError('')
                 navigate('/home');
-            } else {
-                alert('Login failed. Please check your username and password.');
             }
         } catch (error) {
             console.error('Login error:', error);
+            setError('Logowanie nieudane. Sprawdź swoją nazwę użytkownika i hasło.');
         }
     };
 
@@ -50,7 +51,7 @@ function Login() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                 />
-                <br />
+                <br/>
                 <label htmlFor="password">Password:</label>
                 <input
                     type="password"
@@ -60,9 +61,10 @@ function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <br />
+                <br/>
                 <button type="submit">Login</button>
             </form>
+            {error && <div className="error">{error}</div>}
         </div>
     );
 }
