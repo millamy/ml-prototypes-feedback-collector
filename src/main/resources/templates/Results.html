@@ -5,6 +5,10 @@
     <title>Analysis Results</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.js"></script>
+
 </head>
 <body>
 <div class="header">
@@ -65,6 +69,14 @@
 <p style="color: red;" th:text="${error}"></p>
 
 <script>
+    var croppers = [];
+
+    window.onload = function() {
+        var images = document.querySelectorAll('.prototypeImagePath');
+        images.forEach(function(img) {
+            croppers.push(new Cropper(img, {}));
+        });
+    };
     function saveFeedback() {
         var feedbackDataArray = [];
 
@@ -90,6 +102,16 @@
                     + "_activated_prototype_self_act.png";
 
                 feedbackData['correctness'] = selectedValue.value;
+
+                if (croppers[index - 1]) {
+                    const selectionData = croppers[index - 1].getData();
+                    console.log(`Selection Data for image ${index}:`, selectionData);
+                    feedbackData['selectionX'] = selectionData.x;
+                    feedbackData['selectionY'] = selectionData.y;
+                    feedbackData['selectionWidth'] = selectionData.width;
+                    feedbackData['selectionHeight'] = selectionData.height;
+                }
+
                 feedbackDataArray.push(feedbackData);
             }
         }
@@ -97,6 +119,7 @@
 
         var feedbackDataJson = JSON.stringify(feedbackDataArray);
         var responseClone;
+        console.log("Sending:", feedbackDataJson);
         fetch('http://localhost:8080/save-feedback', {
             method: 'PUT',
             headers: {
