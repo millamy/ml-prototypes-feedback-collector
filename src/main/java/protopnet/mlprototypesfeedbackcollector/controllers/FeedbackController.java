@@ -13,6 +13,7 @@ import protopnet.mlprototypesfeedbackcollector.model.FeedbackData;
 import protopnet.mlprototypesfeedbackcollector.service.FeedbackService;
 import protopnet.mlprototypesfeedbackcollector.util.ImageUtil;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +34,12 @@ public class FeedbackController {
     @PutMapping("/save-feedback")
     public ResponseEntity<Map<String, Object>> saveFeedback(@RequestBody List<FeedbackData> feedbackList) {
         try {
+            Date date = new Date();
             for (FeedbackData feedback : feedbackList) {
                 feedback.setUsername(currentUserName());
                 feedback.setOriginalImage(ImageUtil.convertImageToBinary(STATIC_IMAGES_PATH + feedback.getOriginalImagePath()));
                 feedback.setPrototypeImage(ImageUtil.convertImageToBinary(STATIC_IMAGES_PATH + feedback.getPrototypeImagePath()));
+                feedback.setDate(date);
                 feedbackService.saveFeedback(feedback);
 
             }

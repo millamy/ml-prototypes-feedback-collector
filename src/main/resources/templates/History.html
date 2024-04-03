@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>History</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+<div class="header">
+    <nav>
+        <ul>
+            <div class="white-box-header"><a href="/about-us">About Us</a></div>
+            <div class="white-box-header"><a href="/picture-selection">Bird Selection</a></div>
+            <div class="white-box-header sign-out"><a href="/logout">Sign Out</a></div>
+            <div class="white-box-header"><a href="/history">History</a></div>
+        </ul>
+    </nav>
+</div>
+
+<h1>History</h1>
+<div class="white-box">
+
+    <div class="scrollable-table">
+<table border="1">
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Image Class</th>
+        <th>Predicted Image Class</th>
+        <th>Correctness</th>
+        <th>Date</th>
+        <th>Original Image</th>
+        <th>Prototype Image</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="feedback : ${feedbacks}">
+        <td th:text="${feedback.username}"></td>
+        <td th:text="${feedback.imageClass}"></td>
+        <td th:text="${feedback.predictedImageClass}"></td>
+        <td th:text="${feedback.correctness}"></td>
+        <td th:text="${feedback.date}"></td>
+        <td><img th:src="${feedback.originalImagePath}" width="100" height="100" alt="Original Image"></td>
+        <td><img th:src="${feedback.prototypeImagePath}" width="100" height="100" alt="Prototype Image"></td>
+
+    </tr>
+    </tbody>
+</table>
+    </div>
+</div>
+</body>
+</html>
