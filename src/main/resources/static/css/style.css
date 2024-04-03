@@ -388,6 +388,7 @@ select:focus {
 .next-button {
     font-size: 40px;
     padding: 10px 20px;
+    margin: 20px;
     white-space: nowrap;
     align-items: center;
     justify-content: center;
