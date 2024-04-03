@@ -53,6 +53,7 @@
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"  /> Yes</label>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/> No</label>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk" /> I don't know</label>
+                        <button class="cropper-toggle" th:attr="data-index=${index}">Sam oceń</button>
                     </td>
 
                 </tr>
@@ -72,11 +73,23 @@
     var croppers = [];
 
     window.onload = function() {
-        var images = document.querySelectorAll('.prototypeImagePath');
-        images.forEach(function(img) {
-            croppers.push(new Cropper(img, {}));
+        document.querySelectorAll('.cropper-toggle').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var index = this.getAttribute('data-index') - 1;
+                toggleCropper(index);
+            });
         });
     };
+
+    function toggleCropper(index) {
+        var img = document.querySelectorAll('.prototypeImagePath')[index];
+        if (croppers[index]) {
+            croppers[index].destroy();
+            croppers[index] = null;
+        } else {
+            croppers[index] = new Cropper(img, {});
+        }
+    }
     function saveFeedback() {
         var feedbackDataArray = [];
 
@@ -145,7 +158,7 @@
 
     function saveFeedbackAndRedirect() {
         saveFeedback();
-        window.location.href = "/analyze-next";
+        // window.location.href = "/analyze-next";
     }
 
 </script>
