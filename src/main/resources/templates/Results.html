@@ -53,7 +53,7 @@
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"  /> Yes</label>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/> No</label>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk" /> I don't know</label>
-                        <button class="cropper-toggle" th:attr="data-index=${index}">Sam oceń</button>
+                        <button class="cropper-toggle hidden" th:attr="data-index=${index}">Select area</button>
                     </td>
 
                 </tr>
@@ -66,23 +66,91 @@
     </div>
 </div>
 
+<!-- Custom modal -->
+<div id="selectionModal" class="modal" style="display: none;">
+    <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+    <div class="white-box">
+        <p class="modal-text"> Do you want to select the incorrect area on the original image (left) or the prototype image (right)?</p>
+        <button id="leftButton">Left</button>
+        <button id="rightButton">Right</button>
+    </div>
+</div>
+
+
 <!-- Display any errors -->
 <p style="color: red;" th:text="${error}"></p>
 
 <script>
+
+
+    function toggleSelectAreaButton(index) {
+        var button = document.querySelector('.cropper-toggle[data-index="' + (index + 1) + '"]');
+
+        var selectedValue = document.querySelector('input[name="correctness_' + (index + 1) + '"]:checked').value;
+
+        if (selectedValue === 'no') {
+            button.style.display = 'inline-block';
+        } else {
+            button.style.display = 'none';
+        }
+    }
+
+    function addCorrectnessListeners() {
+
+        var correctnessRadioButtons = document.querySelectorAll('input[name^="correctness_"]');
+
+        correctnessRadioButtons.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                var index = parseInt(this.name.replace('correctness_', '')) - 1;
+                toggleSelectAreaButton(index);
+            });
+        });
+    }
+
+    function addSelectAreaButtonListeners() {
+        var buttons = document.querySelectorAll('.cropper-toggle');
+
+        buttons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                showSelectionModal(this);
+            });
+        });
+    }
+    function showSelectionModal(button) {
+
+        var index = parseInt(button.getAttribute('data-index'));
+
+        var modal = document.getElementById('selectionModal');
+        modal.style.display = 'block';
+
+        document.getElementById('leftButton').onclick = function() {
+            modal.style.display = 'none';
+            toggleCropper(index, 'original');
+        };
+
+        document.getElementById('rightButton').onclick = function() {
+            modal.style.display = 'none';
+            toggleCropper(index, 'prototype');
+        };
+    }
+
     var croppers = [];
 
     window.onload = function() {
-        document.querySelectorAll('.cropper-toggle').forEach(function(button) {
-            button.addEventListener('click', function() {
-                var index = this.getAttribute('data-index') - 1;
-                toggleCropper(index);
-            });
-        });
+        addCorrectnessListeners();
+        addSelectAreaButtonListeners();
     };
 
-    function toggleCropper(index) {
-        var img = document.querySelectorAll('.prototypeImagePath')[index];
+    function toggleCropper(index, imageType) {
+        var img;
+
+        // Determine which image element to activate the cropper on
+        if (imageType === 'original') {
+            img = document.querySelectorAll('.originalImagePath')[index - 1];
+        } else {
+            img = document.querySelectorAll('.prototypeImagePath')[index - 1];
+        }
+
         if (croppers[index]) {
             croppers[index].destroy();
             croppers[index] = null;
@@ -157,9 +225,35 @@
     }
 
     function saveFeedbackAndRedirect() {
-        saveFeedback();
-        // window.location.href = "/analyze-next";
+        var allOptionsSelected = true;
+
+        // Loop through each set of radio buttons to check if any option is selected
+        for (var index = 1; index <= 10; index++) {
+            var radioGroup = document.querySelector('input[name="correctness_' + index + '"]').parentElement.parentElement;
+            var selectedValue = document.querySelector('input[name="correctness_' + index + '"]:checked');
+
+            // Remove any existing red frame class
+            radioGroup.classList.remove('red-frame');
+
+            // Check if an option is selected
+            if (!selectedValue) {
+                allOptionsSelected = false;
+                // Apply red frame class to radio button group
+                radioGroup.classList.add('red-frame');
+            }
+        }
+
+        // If all options are selected, save feedback and redirect
+        if (allOptionsSelected) {
+            saveFeedback();
+            // Redirect after saving feedback (commented out in the provided code)
+            window.location.href = "/analyze-next";
+        } else {
+            // If any option is not selected, alert the user
+            alert("Please select an option for every picture before continuing.");
+        }
     }
+
 
 </script>
 
