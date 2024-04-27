@@ -7,20 +7,23 @@ import HomeForRegisteredUser from "./pages/HomeForRegisteredUser";
 import AboutUs from "./pages/AboutUs";
 import BirdSelection from "./pages/BirdSelection";
 import Results from "./pages/Results";
+import { ImageProvider } from './pages/ImageContext';
 
 function App() {
     return (
+        <ImageProvider>
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Home />} exact />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/home" element={<HomeForRegisteredUser />} />
-                <Route path="/aboutUs" element={<AboutUs />} />
-                <Route path="/bird-selection" element={<BirdSelection />} />
-                <Route path="/results" element={<Results />} />
+                <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/picture-selection" element={<BirdSelection />} />
+                <Route path="/selected-pictures" element={<Results />} />
             </Routes>
         </BrowserRouter>
+        </ImageProvider>
     );
 }
 
