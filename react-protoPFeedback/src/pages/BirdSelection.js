@@ -1,107 +1,128 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../style.css';
+import { useImageContext } from './ImageContext';
 
-const BirdSelection = () => {
+function PictureSelection() {
+    const navigate = useNavigate();
+    const { selectedImages, setSelectedImages, selectedBird, setSelectedBird } = useImageContext(); // Access the context
+
     const [birdNames, setBirdNames] = useState([]);
-    const [nameToFolderMap, setNameToFolderMap] = useState({});
-
-    const [selectedBirdKind, setSelectedBirdKind] = useState('');
     const [birdImages, setBirdImages] = useState([]);
-    const [selectedImages, setSelectedImages] = useState([]);
-
     const maxSelectedImages = 3;
 
+    // Fetch bird names from the Spring Boot backend
     useEffect(() => {
-        const fetchedBirdNames = [];
-        const fetchedNameToFolderMap = {};
-        setBirdNames(fetchedBirdNames);
-        setNameToFolderMap(fetchedNameToFolderMap);
-        if (fetchedBirdNames.length > 0) {
-            setSelectedBirdKind(fetchedBirdNames[0]);
-        }
-    }, []);
-
-    useEffect(() => {
-        loadBirdImages(selectedBirdKind);
-    }, [selectedBirdKind, nameToFolderMap]);
-
-    const loadBirdImages = (birdName) => {
-        const folderName = nameToFolderMap[birdName];
-        fetch(`/images/${folderName}`)
+        fetch('/api/bird-names')
             .then(response => response.json())
             .then(data => {
-                setBirdImages(data.map(record => ({
-                    ...record,
-                    blobUrl: base64ToBlob(record.imageData)
-                })));
+                setBirdNames(data);
+                if (data.length > 0) {
+                    setSelectedBird(data[0]);
+                }
             })
-            .catch(error => console.error('Error fetching images:', error));
-    };
+            .catch(error => console.error('Error fetching bird names:', error));
+    }, [setSelectedBird]);
 
-    const handleImageSelect = (imagePath) => {
-        const isSelected = selectedImages.includes(imagePath);
-        if (isSelected) {
-            setSelectedImages(selectedImages.filter(image => image !== imagePath));
+    // Fetch images for the selected bird
+    useEffect(() => {
+        if (selectedBird) {
+            fetch(`/images/${selectedBird}`)
+                .then(response => response.json())
+                .then(data => setBirdImages(data))
+                .catch(error => console.error('Error fetching images:', error));
+        }
+    }, [selectedBird]);
+
+    function handleBirdChange(event) {
+        setSelectedBird(event.target.value);
+    }
+
+    function handleImageClick(imagePath) {
+        if (selectedImages.includes(imagePath)) {
+            setSelectedImages(prevImages => prevImages.filter(image => image !== imagePath));
         } else if (selectedImages.length < maxSelectedImages) {
-            setSelectedImages([...selectedImages, imagePath]);
+            setSelectedImages(prevImages => [...prevImages, imagePath]);
         } else {
             alert('You can only select up to 3 bird pictures.');
         }
-    };
-
-    const base64ToBlob = (base64Data) => {
-        const byteCharacters = atob(base64Data);
-        const byteArrays = [];
-        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-            const slice = byteCharacters.slice(offset, offset + 512);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-            }
-            byteArrays.push(new Uint8Array(byteNumbers));
-        }
-        return URL.createObjectURL(new Blob(byteArrays, { type: 'image/jpeg' }));
-    };
+    }
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        // TODO: Submit selected images to the server
+
+        const formData = new FormData();
+        formData.append('selectedImages', selectedImages.join(';'));
+        formData.append('birdKind', selectedBird);
+
+        // Send the data to the server
+        fetch('http://localhost:8080/selected-pictures', {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Submission successful');
+                    navigate('/selected-pictures');
+                } else {
+                    console.error('Submission failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error during submission:', error);
+            });
     };
 
     return (
         <div>
-            <h2>Please select a bird kind</h2>
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="birdKind">Available bird kinds:</label>
-                <select
-                    id="birdKind"
-                    name="birdKind"
-                    value={selectedBirdKind}
-                    onChange={(e) => setSelectedBirdKind(e.target.value)}
-                >
-                    {birdNames.map((birdName) => (
-                        <option key={birdName} value={birdName}>
-                            {birdName}
-                        </option>
-                    ))}
-                </select>
-                <div className="image-grid">
-                    {birdImages.map((image, index) => (
-                        <img
-                            key={index}
-                            src={image.blobUrl}
-                            alt="Bird"
-                            className={`image-item ${selectedImages.includes(image.folderPath) ? 'selected' : ''}`}
-                            onClick={() => handleImageSelect(image.folderPath)}
-                        />
-                    ))}
+            <div className="header">
+                <nav>
+                    <ul>
+                        <li className="white-box-header"><a href="/home">Home</a></li>
+                        <li className="white-box-header"><a href="/about-us">About Us</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div className="content-container">
+                <div className="white-box">
+                    <h2>Please select a bird kind</h2>
+                    <form onSubmit={handleSubmit}>
+                        <label htmlFor="birdKind">Available bird kinds:</label>
+                        <select
+                            id="birdKind"
+                            name="birdKind"
+                            value={selectedBird}
+                            onChange={handleBirdChange}
+                        >
+                            {birdNames.map(birdName => (
+                                <option key={birdName} value={birdName}>
+                                    {birdName}
+                                </option>
+                            ))}
+                        </select>
+
+                        <br />
+
+                        <div id="birdsImagesGrid" className="image-grid">
+                            {birdImages.map(record => (
+                                <img
+                                    key={record.folderPath}
+                                    src={`data:image/jpeg;base64,${record.imageData}`}
+                                    alt="Bird Image"
+                                    className={`image-item ${selectedImages.includes(record.folderPath) ? 'selected' : ''}`}
+                                    onClick={() => handleImageClick(record.folderPath)}
+                                />
+                            ))}
+                        </div>
+
+                        <input type="hidden" id="selectedImageUrl" name="selectedImageUrl" value={selectedImages.join(';')} />
+                        <button type="submit">Submit</button>
+                    </form>
                 </div>
-                <input type="hidden" id="selectedImageUrl" name="selectedImageUrl" value={selectedImages.join(';')} />
-                <button type="submit">Submit</button>
-            </form>
+            </div>
         </div>
     );
-};
+}
 
-export default BirdSelection;
+export default PictureSelection;
