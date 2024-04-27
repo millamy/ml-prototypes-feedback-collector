@@ -271,5 +271,26 @@ public class ImageController {
         }
     }
 
+    @GetMapping("/api/bird-names")
+    public ResponseEntity<List<String>> getBirdNames() {
+
+        File birdPictureFolder = new File(STATIC_IMAGES_PATH);
+        if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
+            String[] birdNames = birdPictureFolder.list();
+            if (birdNames != null) {
+                birdNames = Arrays.stream(birdNames)
+                        .filter(name -> name.matches("\\d{3}.*"))
+                        .toArray(String[]::new);
+
+                List<String> fullBirdNames = Arrays.asList(birdNames);
+
+                // Return bird names as JSON
+                return ResponseEntity.ok(fullBirdNames);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
 
 }
