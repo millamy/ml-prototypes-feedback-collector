@@ -7,14 +7,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Comparator; 
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -23,11 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -47,6 +37,7 @@ public class ImageController {
     @Value("${images_direct.static.path}")
     private String STATIC_IMAGES_PATH;
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/picture-selection")
     public String showBirdSelection(Model model, HttpSession session) {
         File birdPictureFolder = new File(STATIC_IMAGES_PATH);
@@ -84,7 +75,7 @@ public class ImageController {
         }
         return "PictureSelection";
     }
-
+    @CrossOrigin(origins = "http://localhost:3000")
     private List<String> getBirdProcessedNames(String[] birdNames) {
         return Arrays.stream(birdNames)
                         .map(name -> {
@@ -96,12 +87,11 @@ public class ImageController {
 
 
     //Connecting with model
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/selected-pictures")
     public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind,
             Model model, HttpSession session) {
         String[] imageUrls = selectedImageUrl.split(";");
-
-
         Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
         if (currentImageIndex == null) {
             currentImageIndex = 0;
@@ -192,6 +182,7 @@ public class ImageController {
         return "Results";
 }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/analyze-next")
     public String analyzeNextImage(HttpSession session, Model model) {
         Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
@@ -206,7 +197,7 @@ public class ImageController {
     }
 
     //Fetching images
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/images/{folderName}")
     @ResponseBody
     public ResponseEntity<List<Map<String, String>>> getBirdImages(@PathVariable String folderName) {
@@ -245,6 +236,7 @@ public class ImageController {
         return ResponseEntity.notFound().build();
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/results_images/{imgdir}/{index}/{type}")
     public ResponseEntity<byte[]> getGeneratedImage(
             @PathVariable String imgdir,
@@ -278,5 +270,6 @@ public class ImageController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 }
