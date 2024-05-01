@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import protopnet.mlprototypesfeedbackcollector.model.FeedbackData;
 import protopnet.mlprototypesfeedbackcollector.service.FeedbackService;
+import protopnet.mlprototypesfeedbackcollector.util.ImageUtil;
 
 import java.util.Base64;
 import java.util.List;
@@ -25,11 +26,8 @@ public class FeedbackHistoryController {
         List<FeedbackData> feedbackList = feedbackService.getAllFeedbacks();
 
         feedbackList.forEach(feedback -> {
-            byte[] originalImageBytes = feedback.getOriginalImage().getData(); // Pobierz dane obrazu binarnego
-            String originalImageDataUri = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(originalImageBytes); // Przetwórz obraz na dane URI
-
-            byte[] prototypeImageBytes = feedback.getPrototypeImage().getData(); // Pobierz dane obrazu binarnego
-            String prototypeImageDataUri = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(prototypeImageBytes); // Przetwórz obraz na dane URI
+            String originalImageDataUri = ImageUtil.convertBinaryToImageDataUri(feedback.getOriginalImage());
+            String prototypeImageDataUri = ImageUtil.convertBinaryToImageDataUri(feedback.getPrototypeImage());
 
             feedback.setOriginalImagePath(originalImageDataUri); // Ustaw przetworzony obraz jako ścieżkę obrazu
             feedback.setPrototypeImagePath(prototypeImageDataUri); // Ustaw przetworzony obraz jako ścieżkę obrazu

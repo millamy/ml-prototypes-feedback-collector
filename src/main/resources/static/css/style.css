@@ -196,6 +196,7 @@ body {
     justify-content: center;
     align-content: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 .white-box h2 {
