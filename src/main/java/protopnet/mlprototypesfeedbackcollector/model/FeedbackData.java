@@ -7,23 +7,29 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.bson.types.Binary;
 
 @Document(collection = "feedback")
+@Getter
+@Setter
 public class FeedbackData {
     @Id
     private String id;
-    @Setter
+
     private String username;
     private String imageClass;
     private String predictedImageClass;
-    @Getter
-    @Setter
+
     private Binary originalImage;
-    @Setter
+
     private Binary prototypeImage;
-    @Getter
+
     private String originalImagePath;
-    @Getter
+
     private String prototypeImagePath;
     private String correctness;
+
+
+
+    private String localDate;
+    private String localTime;
 
     public FeedbackData(String id, String imageClass, String predictedImageClass,String originalImagePath,  String prototypeImagePath, String correctness) {
         this.id = id;
@@ -32,6 +38,9 @@ public class FeedbackData {
         this.originalImagePath = originalImagePath;
         this.prototypeImagePath = prototypeImagePath;
         this.correctness = correctness;
+
+        this.localDate = "0000-00-00";
+        this.localTime = "00:00:00";
     }
 
 }
