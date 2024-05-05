@@ -61,7 +61,7 @@ public class ImageController {
 
                 model.addAttribute("birdNames", processedBirdNames);
                 model.addAttribute("nameToFolderMap", birdToFolder);
-                
+
                 session.setAttribute("birdNames", processedBirdNames);
                 session.setAttribute("folderNames", birdNames);
             }

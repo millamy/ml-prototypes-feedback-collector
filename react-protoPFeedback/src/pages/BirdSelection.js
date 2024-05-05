@@ -9,7 +9,7 @@ function PictureSelection() {
     const [selectedBird, setSelectedBird] = useState('');
     const [birdImages, setBirdImages] = useState([]);
     const [selectedImages, setSelectedImages] = useState([]);
-    const maxSelectedImages = 3;
+    const maxSelectedImages = 1;
 
     // Fetch bird names from the Spring Boot backend
     useEffect(() => {
@@ -45,7 +45,7 @@ function PictureSelection() {
             if (selectedImages.length < maxSelectedImages) {
                 setSelectedImages(prevImages => [...prevImages, imagePath]);
             } else {
-                alert('You can only select up to 3 bird pictures.');
+                alert('You can only select only one picture');
             }
         }
     }
@@ -54,7 +54,6 @@ function PictureSelection() {
         event.preventDefault();
 
         const selectedImageUrl = selectedImages.length > 0 ? selectedImages[0] : '';
-        const birdNames = selectedBird ? birdImages.map(record => record.folderPath) : [];
         const formData = new FormData();
         formData.append('selectedImageUrl', selectedImageUrl);
         formData.append('birdKind', selectedBird);
