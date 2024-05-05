@@ -77,12 +77,16 @@ public class ImageController {
     }
     @CrossOrigin(origins = "http://localhost:3000")
     private List<String> getBirdProcessedNames(String[] birdNames) {
-        return Arrays.stream(birdNames)
-                        .map(name -> {
-                            String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
-                            return processedName;
-                        })
-                        .collect(Collectors.toList());
+        if (birdNames != null) {
+            return Arrays.stream(birdNames)
+                    .map(name -> {
+                        String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
+                        return processedName;
+                    })
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
 
@@ -90,7 +94,7 @@ public class ImageController {
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/selected-pictures")
     public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind,
-            Model model, HttpSession session) {
+                                          @RequestParam(required = false) String[] birdNames, Model model, HttpSession session) {
         String[] imageUrls = selectedImageUrl.split(";");
         Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
         if (currentImageIndex == null) {
@@ -153,7 +157,6 @@ public class ImageController {
 
                     // Uncomment to get output to the terminal
                     //System.out.println(output + "\n\n");
-                    String[] birdNames = (String[])session.getAttribute("folderNames");
 
                     model.addAttribute("birdNames", getBirdProcessedNames(birdNames));
                     model.addAttribute("predictedClass", Integer.parseInt(prototypeInfo[1].trim()));
@@ -182,19 +185,21 @@ public class ImageController {
         return "Results";
 }
 
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping("/analyze-next")
-    public String analyzeNextImage(HttpSession session, Model model) {
-        Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
-        String selectedImageUrls = (String) session.getAttribute("selectedImageUrls");
+// --- only selecting one picture for now ----
 
-        if (currentImageIndex != null && selectedImageUrls != null) {
-            session.setAttribute("currentImageIndex", currentImageIndex + 1);
-            return analyzeSelectedPictures(selectedImageUrls, null, model, session);
-        } else {
-            return "redirect:/picture-selection";
-        }
-    }
+//    @CrossOrigin(origins = "http://localhost:3000")
+//    @GetMapping("/analyze-next")
+//    public String analyzeNextImage(HttpSession session, Model model) {
+//        Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
+//        String selectedImageUrls = (String) session.getAttribute("selectedImageUrls");
+//
+//        if (currentImageIndex != null && selectedImageUrls != null) {
+//            session.setAttribute("currentImageIndex", currentImageIndex + 1);
+//            return analyzeSelectedPictures(selectedImageUrls, null, model, session);
+//        } else {
+//            return "redirect:/picture-selection";
+//        }
+//    }
 
     //Fetching images
     @CrossOrigin(origins = "http://localhost:3000")

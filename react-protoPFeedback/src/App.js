@@ -18,7 +18,7 @@ function App() {
                 <Route path="/home" element={<HomeForRegisteredUser />} />
                 <Route path="/about-us" element={<AboutUs />} />
                 <Route path="/picture-selection" element={<BirdSelection />} />
-                <Route path="/selected-pictures" element={<Results />} />
+                <Route path="/results" element={<Results />} />
             </Routes>
         </BrowserRouter>
     );
