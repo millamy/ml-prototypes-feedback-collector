@@ -24,7 +24,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class ImageController {
 
-// Set and change in application.properties
+    // Set and change in application.properties
     @Value("${local_analysis.static.path}")
     private String LOCAL_ANALYSIS_PATH;
 
@@ -46,44 +46,36 @@ public class ImageController {
         if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
             String[] birdNames = birdPictureFolder.list();
             if (birdNames != null) {
-                birdNames = Arrays.stream(birdNames)
-                        .filter(name -> name.matches("\\d{3}.*"))
-                        .toArray(String[]::new);
+                birdNames = Arrays.stream(birdNames).filter(name -> name.matches("\\d{3}.*")).toArray(String[]::new);
 
                 Arrays.sort(birdNames, Comparator.comparingInt(name -> Integer.parseInt(name.substring(0, 3))));
             }
 
-
             if (birdNames != null) {
-                List<String> processedBirdNames = Arrays.stream(birdNames)
-                        .map(name -> {
-                            String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
-                            birdToFolder.put(processedName, name);
-                            return processedName;
-                        })
-                        .sorted()
-                        .collect(Collectors.toList());
-                        
+                List<String> processedBirdNames = Arrays.stream(birdNames).map(name -> {
+                    String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
+                    birdToFolder.put(processedName, name);
+                    return processedName;
+                }).sorted().collect(Collectors.toList());
+
 
                 model.addAttribute("birdNames", processedBirdNames);
                 model.addAttribute("nameToFolderMap", birdToFolder);
-
-
+                
                 session.setAttribute("birdNames", processedBirdNames);
                 session.setAttribute("folderNames", birdNames);
             }
         }
         return "PictureSelection";
     }
+
     @CrossOrigin(origins = "http://localhost:3000")
     private List<String> getBirdProcessedNames(String[] birdNames) {
         if (birdNames != null) {
-            return Arrays.stream(birdNames)
-                    .map(name -> {
-                        String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
-                        return processedName;
-                    })
-                    .collect(Collectors.toList());
+            return Arrays.stream(birdNames).map(name -> {
+                String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
+                return processedName;
+            }).collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
@@ -93,8 +85,7 @@ public class ImageController {
     //Connecting with model
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/selected-pictures")
-    public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind,
-                                          @RequestParam(required = false) String[] birdNames, Model model, HttpSession session) {
+    public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind, @RequestParam(required = false) String[] birdNames, Model model, HttpSession session) {
         String[] imageUrls = selectedImageUrl.split(";");
         Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
         if (currentImageIndex == null) {
@@ -112,27 +103,20 @@ public class ImageController {
 
             // System.out.println("imgclassStr: " + imgclassStr + "\norignalImgclass: " + originalImgclass
             //         + "\nimgclass: " + imgclass + "\nimgdir: " + imgdir + "\nimg: " + img + "\n\n");
-           
-             String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH +
-                    " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH
-                    + imgdir + " -img " + img + " -imgclass " + imgclass;
 
-        ProcessBuilder builder;
+            String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH + " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH + imgdir + " -img " + img + " -imgclass " + imgclass;
 
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
-        } else {
-            builder = new ProcessBuilder("python3", LOCAL_ANALYSIS_PATH,
-                    "-modeldir", MODELDIR_PATH,
-                    "-model", MODEL_PATH,
-                    "-imgdir", STATIC_IMAGES_PATH + imgdir,
-                    "-img", img,
-                    "-imgclass", String.valueOf(imgclass));
-        }
+            ProcessBuilder builder;
 
-        try {
-            builder.redirectErrorStream(true);
-            Process process = builder.start();
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
+            } else {
+                builder = new ProcessBuilder("python3", LOCAL_ANALYSIS_PATH, "-modeldir", MODELDIR_PATH, "-model", MODEL_PATH, "-imgdir", STATIC_IMAGES_PATH + imgdir, "-img", img, "-imgclass", String.valueOf(imgclass));
+            }
+
+            try {
+                builder.redirectErrorStream(true);
+                Process process = builder.start();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 StringBuilder output = new StringBuilder();
@@ -174,16 +158,15 @@ public class ImageController {
                 model.addAttribute("error", "Error executing the analysis command: " + e.getMessage());
                 return "Results";
             }
-        session.setAttribute("currentImageIndex", currentImageIndex);
-        session.setAttribute("selectedImageUrls", selectedImageUrl);
-    } else {
-        session.removeAttribute("currentImageIndex");
-        session.removeAttribute("selectedImageUrls");
-        return "redirect:/picture-selection";
-    }
-
+            session.setAttribute("currentImageIndex", currentImageIndex);
+            session.setAttribute("selectedImageUrls", selectedImageUrl);
+        } else {
+            session.removeAttribute("currentImageIndex");
+            session.removeAttribute("selectedImageUrls");
+            return "redirect:/picture-selection";
+        }
         return "Results";
-}
+    }
 
 // --- only selecting one picture for now ----
 
@@ -206,60 +189,44 @@ public class ImageController {
     @GetMapping("/images/{folderName}")
     @ResponseBody
     public ResponseEntity<List<Map<String, String>>> getBirdImages(@PathVariable String folderName) {
-        
+        List<Map<String, String>> imageDatas = new ArrayList<>();
+        File birdFolder = new File(STATIC_IMAGES_PATH + folderName);
 
-       
-            List<Map<String, String>> imageDatas = new ArrayList<>();
-            File birdFolder = new File(STATIC_IMAGES_PATH + folderName);
+        if (birdFolder.exists() && birdFolder.isDirectory()) {
+            File[] birdImages = birdFolder.listFiles();
+            if (birdImages != null) {
+                for (File file : birdImages) {
+                    if (file.isFile()) {
+                        try {
+                            byte[] imageData = Files.readAllBytes(file.toPath());
+                            String base64Image = Base64.getEncoder().encodeToString(imageData);
 
-            if (birdFolder.exists() && birdFolder.isDirectory()) {
-                File[] birdImages = birdFolder.listFiles();
-                if (birdImages != null) {
-                    for (File file : birdImages) {
-                        if (file.isFile()) {
-                            try {
-                                byte[] imageData = Files.readAllBytes(file.toPath());
-                                String base64Image = Base64.getEncoder().encodeToString(imageData);
 
-                                
-                                Map<String, String> imageDataMap = new HashMap<>();
-                                imageDataMap.put("imageData", base64Image);
-                                imageDataMap.put("folderPath", folderName+"/"+file.getName());
+                            Map<String, String> imageDataMap = new HashMap<>();
+                            imageDataMap.put("imageData", base64Image);
+                            imageDataMap.put("folderPath", folderName + "/" + file.getName());
 
-                                imageDatas.add(imageDataMap);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            imageDatas.add(imageDataMap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
-                return ResponseEntity.ok(imageDatas);
             }
-
-            
-
+            return ResponseEntity.ok(imageDatas);
+        }
         return ResponseEntity.notFound().build();
     }
 
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/results_images/{imgdir}/{index}/{type}")
-    public ResponseEntity<byte[]> getGeneratedImage(
-            @PathVariable String imgdir,
-            @PathVariable String index,
-            @PathVariable String type) {
+    public ResponseEntity<byte[]> getGeneratedImage(@PathVariable String imgdir, @PathVariable String index, @PathVariable String type) {
 
         String filePath;
-
         if (type.equals("prototype")) {
-            filePath = STATIC_IMAGES_PATH
-                    + imgdir
-                    + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/prototype_activation_map_by_top-"
-                    + index + "_prototype.png";
+            filePath = STATIC_IMAGES_PATH + imgdir + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/prototype_activation_map_by_top-" + index + "_prototype.png";
         } else {
-            filePath = STATIC_IMAGES_PATH
-                    +
-                    imgdir + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-" + index
-                    + "_activated_prototype_self_act.png";
+            filePath = STATIC_IMAGES_PATH + imgdir + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-" + index + "_activated_prototype_self_act.png";
         }
 
         try {
@@ -278,14 +245,11 @@ public class ImageController {
 
     @GetMapping("/api/bird-names")
     public ResponseEntity<List<String>> getBirdNames() {
-
         File birdPictureFolder = new File(STATIC_IMAGES_PATH);
         if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
             String[] birdNames = birdPictureFolder.list();
             if (birdNames != null) {
-                birdNames = Arrays.stream(birdNames)
-                        .filter(name -> name.matches("\\d{3}.*"))
-                        .toArray(String[]::new);
+                birdNames = Arrays.stream(birdNames).filter(name -> name.matches("\\d{3}.*")).toArray(String[]::new);
 
                 List<String> fullBirdNames = Arrays.asList(birdNames);
 
@@ -295,7 +259,4 @@ public class ImageController {
         }
         return ResponseEntity.notFound().build();
     }
-
-
-
 }
