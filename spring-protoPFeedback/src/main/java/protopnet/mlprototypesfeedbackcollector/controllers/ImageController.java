@@ -249,7 +249,7 @@ public class ImageController {
         if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
             String[] birdNames = birdPictureFolder.list();
             if (birdNames != null) {
-                birdNames = Arrays.stream(birdNames).filter(name -> name.matches("\\d{3}.*")).toArray(String[]::new);
+                birdNames = Arrays.stream(birdNames).filter(name -> name.matches("\\d{3}.*")).sorted(Comparator.comparingInt(name -> Integer.parseInt(name.substring(0, 3)))).toArray(String[]::new);
 
                 List<String> fullBirdNames = Arrays.asList(birdNames);
 

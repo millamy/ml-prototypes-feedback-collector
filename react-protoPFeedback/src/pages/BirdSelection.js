@@ -77,6 +77,9 @@ function PictureSelection() {
             });
     };
 
+    function formatBirdName(name) {
+        return name.replace(/(\d+\.)|_/g, ' ').trim();
+    }
 
     return (
         <div>
@@ -102,7 +105,7 @@ function PictureSelection() {
                         >
                             {birdNames.map(birdName => (
                                 <option key={birdName} value={birdName}>
-                                    {birdName}
+                                    {formatBirdName(birdName)}
                                 </option>
                             ))}
                         </select>
