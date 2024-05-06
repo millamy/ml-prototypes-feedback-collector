@@ -23,8 +23,10 @@
     <div class="analysis-box">
         <h1 class="title">Analysis Results</h1>
         <div th:if="${birdNames != null}">
-            <p class="image-info">Original Image Class: <span id="originalImageClass" th:text="${birdNames[originalImgclass - 1]}"></span></p>
-            <p class="image-info">Predicted Class: <span id="predictedImageClass" th:text="${birdNames[predictedClass]}"></span></p>
+            <p class="image-info">Original Image Class: <span id="originalImageClass"
+                                                              th:text="${birdNames[originalImgclass - 1]}"></span></p>
+            <p class="image-info">Predicted Class: <span id="predictedImageClass"
+                                                         th:text="${birdNames[predictedClass]}"></span></p>
         </div>
     </div>
 </div>
@@ -44,25 +46,29 @@
                 <tbody>
                 <tr th:each="index : ${#numbers.sequence(1, 10)}">
                     <td>
-                        <img class="originalImagePath" th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/prototype'}" alt="Original Image"/>
+                        <img class="originalImagePath"
+                             th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/prototype'}"
+                             alt="Original Image"/>
                     </td>
                     <td>
-                        <img class="prototypeImagePath" th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}" alt="Prototype Image"/>
+                        <img class="prototypeImagePath"
+                             th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}"
+                             alt="Prototype Image"/>
                     </td>
                     <td>
-                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"  /> Yes</label>
+                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"/> Yes</label>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/> No</label>
-                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk" /> I don't know</label>
-                        <button class="cropper-toggle hidden" th:attr="data-index=${index}">Select area</button>
+                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk"/> I don't
+                            know</label>
+                        <button class="cropper-toggle hidden" th:attr="data-index=${index}" hidden>Select area</button>
                     </td>
-
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
     <div class="next-button">
-        <a class="action-button" href="#" onclick="saveFeedbackAndRedirect()" >Save & Continue</a>
+        <a class="action-button" href="#" onclick="saveFeedbackAndRedirect()">Save & Continue</a>
     </div>
 </div>
 
@@ -70,7 +76,8 @@
 <div id="selectionModal" class="modal" style="display: none;">
     <link rel="stylesheet" type="text/css" href="/css/style.css"/>
     <div class="white-box">
-        <p class="modal-text"> Do you want to select the incorrect area on the original image (left) or the prototype image (right)?</p>
+        <p class="modal-text"> Do you want to select the incorrect area on the original image (left) or the prototype
+            image (right)?</p>
         <button id="leftButton">Left</button>
         <button id="rightButton">Right</button>
     </div>
@@ -110,12 +117,13 @@
     function addSelectAreaButtonListeners() {
         var buttons = document.querySelectorAll('.cropper-toggle');
 
-        buttons.forEach(function(button) {
-            button.addEventListener('click', function() {
+        buttons.forEach(function (button) {
+            button.addEventListener('click', function () {
                 showSelectionModal(this);
             });
         });
     }
+
     function showSelectionModal(button) {
 
         var index = parseInt(button.getAttribute('data-index'));
@@ -123,12 +131,12 @@
         var modal = document.getElementById('selectionModal');
         modal.style.display = 'block';
 
-        document.getElementById('leftButton').onclick = function() {
+        document.getElementById('leftButton').onclick = function () {
             modal.style.display = 'none';
             toggleCropper(index, 'original');
         };
 
-        document.getElementById('rightButton').onclick = function() {
+        document.getElementById('rightButton').onclick = function () {
             modal.style.display = 'none';
             toggleCropper(index, 'prototype');
         };
@@ -136,7 +144,7 @@
 
     var croppers = [];
 
-    window.onload = function() {
+    window.onload = function () {
         addCorrectnessListeners();
         addSelectAreaButtonListeners();
     };
@@ -158,6 +166,7 @@
             croppers[index] = new Cropper(img, {});
         }
     }
+
     function saveFeedback() {
         var feedbackDataArray = [];
 

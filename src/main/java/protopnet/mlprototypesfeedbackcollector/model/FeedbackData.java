@@ -1,5 +1,4 @@
 package protopnet.mlprototypesfeedbackcollector.model;
-
 import jakarta.websocket.Decoder;
 import lombok.Data;
 import lombok.Getter;
@@ -9,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.bson.types.Binary;
 
 @Document(collection = "feedback")
+@Getter
+@Setter
 @Data
 public class FeedbackData {
     @Id
@@ -26,6 +27,11 @@ public class FeedbackData {
     private Integer selectionWidth;
     private Integer selectionHeight;
 
+
+
+    private String localDate;
+    private String localTime;
+
     public FeedbackData(String id, String imageClass, String predictedImageClass,String originalImagePath,  String prototypeImagePath, String correctness) {
         this.id = id;
         this.imageClass = imageClass;
@@ -33,6 +39,9 @@ public class FeedbackData {
         this.originalImagePath = originalImagePath;
         this.prototypeImagePath = prototypeImagePath;
         this.correctness = correctness;
+
+        this.localDate = "0000-00-00";
+        this.localTime = "00:00:00";
     }
 
 }

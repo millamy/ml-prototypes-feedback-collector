@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>History</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <style>
+        th {
+            cursor: pointer;
+        }
+        .sort-menu {
+            margin-bottom: 10px;
+        }
+        .sort-menu label {
+            margin-right: 10px;
+        }
+        .sorting-criteria-list {
+            margin-bottom: 10px;
+        }
+        .sorting-criteria-list-item {
+            display: inline-block;
+            margin-right: 5px;
+            padding: 2px 5px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .arrow-up {
+            display: none;
+        }
+        .arrow-down.active {
+            display: inline-block;
+        }
+        .arrow-up.active {
+            display: inline-block;
+        }
+        .arrow-down {
+            display: none;
+        }
+        .filter-input {
+            margin-bottom: 5px;
+        }
+        .filter-input-info {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <nav>
+        <ul>
+            <div class="white-box-header"><a href="/about-us">About Us</a></div>
+            <div class="white-box-header"><a href="/picture-selection">Bird Selection</a></div>
+            <div class="white-box-header sign-out"><a href="/logout">Sign Out</a></div>
+            <div class="white-box-header"><a href="/history">History</a></div>
+        </ul>
+    </nav>
+</div>
+
+<h1>History</h1>
+
+<div class="white-box">
+    <!-- Sorting Menu -->
+    <div class="sort-menu">
+        <label>Sort by:</label>
+        <select id="sortSelect">
+        </select>
+        <button onclick="addSortingCriteria()">Add Sorting Criteria</button>
+        <button onclick="sortTable()">Sort</button>
+        <button id="toggleDirectionButton" onclick="toggleSortDirection()">
+            <span class="arrow-up active" id="arrowUp">&#x25B2;</span>
+            <span class="arrow-down" id="arrowDown">&#x25BC;</span>
+        </button>
+    </div>
+
+    <!-- Sorting Criteria List -->
+    <div class="sorting-criteria-list" id="sortingCriteriaList">
+    </div>
+
+
+    <div class="filters">
+        <div class="filter-input-info">(Separate multiple filters by ";")</div>
+        <div class="filter-input-info">(Exclude by adding prefix "~")</div>
+    </div>
+</div>
+
+<div class="white-box">
+    <button onclick="exportTableToCSV()">Export to CSV</button>
+    <div class="scrollable-table">
+        <table id="feedbackTable" border="1">
+            <thead>
+            <tr>
+                <th>Username</th>
+                <th>Image Class</th>
+                <th>Predicted Image Class</th>
+                <th>Correctness</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Original Image</th>
+                <th>Prototype Image</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="feedback : ${feedbacks}">
+                <td th:text="${feedback.username}"></td>
+                <td th:text="${feedback.imageClass}"></td>
+                <td th:text="${feedback.predictedImageClass}"></td>
+                <td th:text="${feedback.correctness}"></td>
+                <td th:text="${feedback.localDate}"></td>
+                <td th:text="${feedback.localTime}"></td>
+                <td><img th:src="${feedback.originalImagePath}" width="100" height="100" alt="Original Image"></td>
+                <td><img th:src="${feedback.prototypeImagePath}" width="100" height="100" alt="Prototype Image"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    var sortingCriteria = [];
+    var sortDirection = "asc";
+    var columns = ["Username", "Image Class", "Predicted Image Class", "Correctness", "Date", "Time"];
+
+    // Initialize sorting options
+    var sortSelect = document.getElementById("sortSelect");
+    columns.forEach(function(column, index) {
+        var optionElement = document.createElement("option");
+        optionElement.value = index;
+        optionElement.text = column;
+        sortSelect.appendChild(optionElement);
+    });
+
+    function addSortingCriteria() {
+        var selectedOption = document.getElementById("sortSelect");
+        var columnIndex = parseInt(selectedOption.value);
+        var index = sortingCriteria.indexOf(columnIndex);
+        if (index === -1) {
+            sortingCriteria.push(columnIndex);
+        } else {
+            sortingCriteria.splice(index, 1);
+        }
+        updateSortingCriteriaList();
+    }
+
+    function updateSortingCriteriaList() {
+        var sortingCriteriaList = document.getElementById("sortingCriteriaList");
+        sortingCriteriaList.innerHTML = "";
+        sortingCriteria.forEach(function (criteria) {
+            var criteriaName = columns[criteria];
+            var criteriaItem = document.createElement("div");
+            criteriaItem.classList.add("sorting-criteria-list-item");
+            criteriaItem.textContent = criteriaName;
+            criteriaItem.setAttribute("onclick", "removeSortingCriteria(" + criteria + ")");
+            sortingCriteriaList.appendChild(criteriaItem);
+        });
+    }
+
+    function removeSortingCriteria(columnIndex) {
+        var index = sortingCriteria.indexOf(columnIndex);
+        if (index !== -1) {
+            sortingCriteria.splice(index, 1);
+            updateSortingCriteriaList();
+        }
+    }
+
+    function sortTable() {
+        var table = document.getElementById("feedbackTable");
+        var rows = table.rows;
+
+        rows = Array.from(rows).slice(1); // Convert to array and remove header row
+        rows.sort(compareRows);
+
+        // Update table with sorted rows
+        var tbody = table.getElementsByTagName("tbody")[0];
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+        rows.forEach(function (row) {
+            tbody.appendChild(row);
+        });
+    }
+
+    function compareRows(rowA, rowB) {
+        for (var i = 0; i < sortingCriteria.length; i++) {
+            var columnIndex = sortingCriteria[i];
+            var x = rowA.getElementsByTagName("TD")[columnIndex];
+            var y = rowB.getElementsByTagName("TD")[columnIndex];
+            var comparison = compareValues(x.innerHTML, y.innerHTML);
+            if (comparison !== 0) {
+                return comparison;
+            }
+        }
+        return 0;
+    }
+
+    function compareValues(valueA, valueB) {
+        if (valueA < valueB) {
+            return sortDirection === "asc" ? -1 : 1;
+        } else if (valueA > valueB) {
+            return sortDirection === "asc" ? 1 : -1;
+        } else {
+            return 0;
+        }
+    }
+
+    function toggleSortDirection() {
+        var arrowUp = document.getElementById("arrowUp");
+        var arrowDown = document.getElementById("arrowDown");
+        if (sortDirection === "asc") {
+            sortDirection = "desc";
+            arrowUp.classList.remove("active");
+            arrowDown.classList.add("active");
+        } else {
+            sortDirection = "asc";
+            arrowUp.classList.add("active");
+            arrowDown.classList.remove("active");
+        }
+    }
+
+    // Generate filtering inputs dynamically
+    var filterSection = document.querySelector(".filters");
+    columns.forEach(function(column, index) {
+        var filterInput = document.createElement("div");
+        filterInput.classList.add("filter-input");
+        var input = document.createElement("input");
+        input.type = "text";
+        input.id = column.replace(/\s+/g, '') + "Filter"; // Remove spaces from column name for id
+        input.onkeyup = function() { filterTable(index); };
+        input.placeholder = "Filter by " + column;
+        filterInput.appendChild(input);
+        filterSection.appendChild(filterInput);
+    });
+
+    function filterTable(columnIndex) {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById(columns[columnIndex].replace(/\s+/g, '') + "Filter");
+        filter = input.value.toUpperCase();
+
+        // Split the filter into include and exclude parts
+        var filters = filter.split(';').map(f => f.trim());
+        var includeFilters = filters.filter(f => !f.startsWith('~'));
+        var excludeFilters = filters.filter(f => f.startsWith('~')).map(f => f.substring(1));
+
+        table = document.getElementById("feedbackTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[columnIndex];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                var matchesInclude = includeFilters.length === 0 || includeFilters.some(filter => txtValue.toUpperCase().includes(filter));
+                var matchesExclude = excludeFilters.some(filter => txtValue.toUpperCase().includes(filter));
+
+                // Show the row if it matches any of the inclusion filters and none of the exclusion filters
+                if (matchesInclude && !matchesExclude) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function exportTableToCSV() {
+        var csv = [];
+        var rows = document.querySelectorAll("#feedbackTable tbody tr");
+
+        // Filter and sort the rows based on the current sorting criteria and filters
+        var filteredRows = Array.from(rows).sort(compareRows);
+
+        // Loop through each row and collect cell data
+        filteredRows.forEach(function(row) {
+            if (row.style.display !== "none") {
+                var rowData = [];
+                row.querySelectorAll("td").forEach(function (cell) {
+                    rowData.push(cell.textContent.trim());
+                });
+                csv.push(rowData.join(","));
+            }
+        });
+
+        // Convert the CSV array to a string
+        var csvString = csv.join("\n");
+
+        // Create a Blob object to save the CSV data
+        var blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+
+        // Create a temporary link element to trigger the download
+        var link = document.createElement("a");
+        var url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "table.csv");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+   
+
+
+</script>
+</body>
+</html>
