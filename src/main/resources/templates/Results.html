@@ -16,6 +16,7 @@
         <ul>
             <div class="white-box-header"><a href="/home">Home</a></div>
             <div class="white-box-header"><a href="/about-us">About Us</a></div>
+            <div class="white-box-header"><a href="/history">History</a></div>
         </ul>
     </nav>
 </div>
@@ -46,15 +47,12 @@
                 <tbody>
                 <tr th:each="index : ${#numbers.sequence(1, 10)}">
                     <td>
-                        <img class="originalImagePath"
-                             th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/prototype'}"
-                             alt="Original Image"/>
+                        <canvas class="originalImageCanvas" th:data-src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/prototype'}"></canvas>
                     </td>
                     <td>
-                        <img class="prototypeImagePath"
-                             th:src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}"
-                             alt="Prototype Image"/>
+                        <canvas class="prototypeImageCanvas" th:data-src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}"></canvas>
                     </td>
+
                     <td>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"/> Yes</label>
                         <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/> No</label>
@@ -114,15 +112,21 @@
         });
     }
 
-    function addSelectAreaButtonListeners() {
-        var buttons = document.querySelectorAll('.cropper-toggle');
-
-        buttons.forEach(function (button) {
-            button.addEventListener('click', function () {
-                showSelectionModal(this);
-            });
+    document.querySelectorAll('.cropper-toggle').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = this.getAttribute('data-index');
+            const modal = document.getElementById('selectionModal');
+            modal.style.display = 'block';
+            document.getElementById('leftButton').onclick = function() {
+                modal.style.display = 'none';
+                activateDrawing(document.querySelectorAll('.originalImageCanvas')[index], 'original');
+            };
+            document.getElementById('rightButton').onclick = function() {
+                modal.style.display = 'none';
+                activateDrawing(document.querySelectorAll('.prototypeImageCanvas')[index], 'prototype');
+            };
         });
-    }
+    });
 
     function showSelectionModal(button) {
 
@@ -144,10 +148,42 @@
 
     var croppers = [];
 
-    window.onload = function () {
+    window.onload = function() {
         addCorrectnessListeners();
-        addSelectAreaButtonListeners();
+        loadImagesToCanvas();
+        setupSelectAreaListeners();
     };
+
+    function loadImagesToCanvas() {
+        document.querySelectorAll('canvas[data-src]').forEach(canvas => {
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            img.src = canvas.getAttribute('data-src');
+            img.onload = () => {
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                ctx.drawImage(img, 0, 0);
+            };
+        });
+    }
+
+    function setupSelectAreaListeners() {
+        document.querySelectorAll('.cropper-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                const index = this.getAttribute('data-index');
+                const modal = document.getElementById('selectionModal');
+                modal.style.display = 'block';
+                document.getElementById('leftButton').onclick = function() {
+                    modal.style.display = 'none';
+                    activateDrawing(document.querySelectorAll('.originalImageCanvas')[index-1], 'original');
+                };
+                document.getElementById('rightButton').onclick = function() {
+                    modal.style.display = 'none';
+                    activateDrawing(document.querySelectorAll('.prototypeImageCanvas')[index-1], 'prototype');
+                };
+            });
+        });
+    }
 
     function toggleCropper(index, imageType) {
         var img;
@@ -263,6 +299,54 @@
         }
     }
 
+    function activateDrawing(canvas, type) {
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = canvas.getAttribute('data-src');
+        img.onload = () => {
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            ctx.drawImage(img, 0, 0);
+        };
+
+        let isDrawing = false;
+        let points = [];
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            points = [{ x: e.offsetX, y: e.offsetY }];
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            points.push({ x: e.offsetX, y: e.offsetY });
+        }
+
+        function stopDrawing(e) {
+            if (!isDrawing) return;
+            draw(e);
+            ctx.lineTo(points[0].x, points[0].y);
+            ctx.stroke();
+            ctx.closePath();
+            isDrawing = false;
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mousedown', clearCanvas);
+    }
 
 </script>
 
