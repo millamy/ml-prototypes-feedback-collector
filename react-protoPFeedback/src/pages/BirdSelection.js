@@ -1,15 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import '../style.css';
-import { useImageContext } from './ImageContext';
+
 
 function PictureSelection() {
-    const navigate = useNavigate();
-    const { selectedImages, setSelectedImages, selectedBird, setSelectedBird } = useImageContext(); // Access the context
-
     const [birdNames, setBirdNames] = useState([]);
+    const [selectedBird, setSelectedBird] = useState('');
     const [birdImages, setBirdImages] = useState([]);
-    const maxSelectedImages = 3;
+    const [selectedImages, setSelectedImages] = useState([]);
+    const maxSelectedImages = 1;
 
     // Fetch bird names from the Spring Boot backend
     useEffect(() => {
@@ -22,9 +22,8 @@ function PictureSelection() {
                 }
             })
             .catch(error => console.error('Error fetching bird names:', error));
-    }, [setSelectedBird]);
+    }, []);
 
-    // Fetch images for the selected bird
     useEffect(() => {
         if (selectedBird) {
             fetch(`/images/${selectedBird}`)
@@ -38,33 +37,38 @@ function PictureSelection() {
         setSelectedBird(event.target.value);
     }
 
+
     function handleImageClick(imagePath) {
         if (selectedImages.includes(imagePath)) {
             setSelectedImages(prevImages => prevImages.filter(image => image !== imagePath));
-        } else if (selectedImages.length < maxSelectedImages) {
-            setSelectedImages(prevImages => [...prevImages, imagePath]);
         } else {
-            alert('You can only select up to 3 bird pictures.');
+            if (selectedImages.length < maxSelectedImages) {
+                setSelectedImages(prevImages => [...prevImages, imagePath]);
+            } else {
+                alert('You can only select only one picture');
+            }
         }
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
 
+        const selectedImageUrl = selectedImages.length > 0 ? selectedImages[0] : '';
         const formData = new FormData();
-        formData.append('selectedImages', selectedImages.join(';'));
+        formData.append('selectedImageUrl', selectedImageUrl);
         formData.append('birdKind', selectedBird);
+        formData.append('birdNames', JSON.stringify(birdNames));
 
-        // Send the data to the server
         fetch('http://localhost:8080/selected-pictures', {
             method: 'POST',
             body: formData,
         })
             .then(response => {
                 if (response.ok) {
+                    // Handle successful submission (e.g., show a success message or redirect)
                     console.log('Submission successful');
-                    navigate('/selected-pictures');
                 } else {
+                    // Handle error
                     console.error('Submission failed');
                 }
             })
@@ -73,13 +77,17 @@ function PictureSelection() {
             });
     };
 
+    function formatBirdName(name) {
+        return name.replace(/(\d+\.)|_/g, ' ').trim();
+    }
+
     return (
         <div>
             <div className="header">
                 <nav>
                     <ul>
-                        <li className="white-box-header"><a href="/home">Home</a></li>
-                        <li className="white-box-header"><a href="/about-us">About Us</a></li>
+                        <div className="white-box-header"><a href="/home">Home</a></div>
+                        <div className="white-box-header"><a href="/about-us">About Us</a></div>
                     </ul>
                 </nav>
             </div>
@@ -97,13 +105,11 @@ function PictureSelection() {
                         >
                             {birdNames.map(birdName => (
                                 <option key={birdName} value={birdName}>
-                                    {birdName}
+                                    {formatBirdName(birdName)}
                                 </option>
                             ))}
                         </select>
-
                         <br />
-
                         <div id="birdsImagesGrid" className="image-grid">
                             {birdImages.map(record => (
                                 <img
@@ -115,7 +121,6 @@ function PictureSelection() {
                                 />
                             ))}
                         </div>
-
                         <input type="hidden" id="selectedImageUrl" name="selectedImageUrl" value={selectedImages.join(';')} />
                         <button type="submit">Submit</button>
                     </form>

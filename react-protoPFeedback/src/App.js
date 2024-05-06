@@ -7,11 +7,9 @@ import HomeForRegisteredUser from "./pages/HomeForRegisteredUser";
 import AboutUs from "./pages/AboutUs";
 import BirdSelection from "./pages/BirdSelection";
 import Results from "./pages/Results";
-import { ImageProvider } from './pages/ImageContext';
 
 function App() {
     return (
-        <ImageProvider>
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Home />} exact />
@@ -20,10 +18,9 @@ function App() {
                 <Route path="/home" element={<HomeForRegisteredUser />} />
                 <Route path="/about-us" element={<AboutUs />} />
                 <Route path="/picture-selection" element={<BirdSelection />} />
-                <Route path="/selected-pictures" element={<Results />} />
+                <Route path="/results" element={<Results />} />
             </Routes>
         </BrowserRouter>
-        </ImageProvider>
     );
 }
 
