@@ -1,101 +1,79 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../style.css';
 
-function AnalysisResults() {
-    const navigate = useNavigate();
-    const [analysisResults, setAnalysisResults] = useState(null);
-    const [prototypes, setPrototypes] = useState([]);
-    const [correctnessFeedback, setCorrectnessFeedback] = useState([]);
+function Results({ birdNames, originalImgclass, predictedClass, imgdir, error }) {
+    const [feedbackDataArray, setFeedbackDataArray] = useState([]);
+    console.log('imgdir:', imgdir);
+    console.log('birdNames:', birdNames);
+    console.log('originalImgclass:', originalImgclass);
 
-    // TO DO: implement /api/analysis-results endpoint (or fetch data from existing endpoints).
-    // Rewritten by ChatGPT just to compile without errors.
-    // Right now this page is not showing anything.
-    //Feel free to change as you like.
+    const saveFeedback = () => {
+        // Collect feedback data from radio buttons
+        for (let index = 1; index <= 10; index++) {
+            const selectedValue = document.querySelector(`input[name="correctness_${index}"]:checked`);
+            if (selectedValue) {
+                const feedbackData = {};
+                feedbackData['imageClass'] = document.getElementById("originalImageClass").innerText;
+                feedbackData['predictedImageClass'] = document.getElementById("predictedImageClass").innerText;
+                const thSrc = document.getElementsByClassName("originalImagePath")[index - 1].getAttribute("src");
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch('/api/analysis-results');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch analysis results');
-                }
-                const data = await response.json();
-                setAnalysisResults(data);
-                setPrototypes(data.prototypes || []);
+                let parts = thSrc.split("/");
 
+                let imgdir = parts[2]; // ex. "037.Acadian_Flycatcher"
+                let pathIndex = parts[3]; // ex. "1"
 
-                setCorrectnessFeedback(data.prototypes.map(() => ''));
-            } catch (error) {
-                console.error('Error fetching analysis results:', error);
+                feedbackData['originalImagePath'] = `${imgdir}/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/prototype_activation_map_by_top-${pathIndex}_prototype.png`;
 
+                feedbackData['prototypeImagePath'] = `${imgdir}/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-${pathIndex}_activated_prototype_self_act.png`;
+
+                feedbackData['correctness'] = selectedValue.value;
+                setFeedbackDataArray(prevData => [...prevData, feedbackData]);
             }
-        };
-
-        fetchData();
-    }, []);
-
-    const handleFeedbackChange = (index, value) => {
-        const updatedFeedback = [...correctnessFeedback];
-        updatedFeedback[index] = value;
-        setCorrectnessFeedback(updatedFeedback);
-    };
-
-    const saveFeedbackAndContinue = async () => {
-        const feedbackDataArray = prototypes.map((prototype, index) => ({
-            imageClass: analysisResults.originalImgclass,
-            predictedImageClass: analysisResults.predictedClass,
-            originalImagePath: `/results_images/${analysisResults.imgdir}/${index + 1}/prototype`,
-            prototypeImagePath: `/results_images/${analysisResults.imgdir}/${index + 1}/activated`,
-            correctness: correctnessFeedback[index]
-        }));
-
-        try {
-            const response = await fetch('http://localhost:8080/save-feedback', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(feedbackDataArray)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to save feedback');
-            }
-
-            const data = await response.json();
-            console.log('Feedback saved successfully:', data);
-
-            // Navigate to the next analysis page
-            navigate('/analyze-next');
-        } catch (error) {
-            console.error('Error saving feedback:', error);
         }
+        console.log(feedbackDataArray);
+
+        const feedbackDataJson = JSON.stringify(feedbackDataArray);
+        fetch('http://localhost:8080/save-feedback', {
+            method: 'PUT',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: feedbackDataJson
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('Error parsing JSON from response:', error);
+            });
     };
 
-    if (!analysisResults) {
-        // Show loading state while analysis results are being fetched
-        return <div>Loading...</div>;
-    }
+    const saveFeedbackAndRedirect = async () => {
+        await saveFeedback();
+        window.location.href = "/analyze-next";
+    };
 
     return (
         <div>
+
             <div className="header">
                 <nav>
                     <ul>
-                        <li className="white-box-header"><a href="/home">Home</a></li>
-                        <li className="white-box-header"><a href="/about-us">About Us</a></li>
+                        <div className="white-box-header"><a href="/home">Home</a></div>
+                        <div className="white-box-header"><a href="/about-us">About Us</a></div>
                     </ul>
                 </nav>
             </div>
-
             <div className="results-container">
                 <div className="analysis-box">
                     <h1 className="title">Analysis Results</h1>
-                    <div>
-                        <p className="image-info">Original Image Class: <span>{analysisResults.originalImgclass}</span></p>
-                        <p className="image-info">Predicted Class: <span>{analysisResults.predictedClass}</span></p>
-                    </div>
+                    {birdNames && (
+                        <div>
+                            <p className="image-info">Original Image Class: <span id="originalImageClass">{birdNames[originalImgclass - 1]}</span></p>
+                            <p className="image-info">Predicted Class: <span id="predictedImageClass">{birdNames[predictedClass]}</span></p>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -106,59 +84,25 @@ function AnalysisResults() {
                         <table border="1">
                             <thead>
                             <tr>
-                                <th style={{ width: '35%' }}>Original Image</th>
-                                <th style={{ width: '35%' }}>Prototype Image</th>
-                                <th style={{ width: '30%' }}>Correctness</th>
+                                <th style={{width: '35%'}}>Original Image</th>
+                                <th style={{width: '35%'}}>Prototype Image</th>
+                                <th style={{width: '30%'}}>Correctness</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {prototypes.map((prototype, index) => (
+                            {/* Replace this with your actual data */}
+                            {Array.from({ length: 10 }, (_, index) => (
                                 <tr key={index}>
                                     <td>
-                                        <img
-                                            className="originalImagePath"
-                                            src={`/results_images/${analysisResults.imgdir}/${index + 1}/prototype`}
-                                            alt="Original Image"
-                                        />
+                                        <img className="originalImagePath" src={`/results_images/${imgdir}/${index + 1}/prototype`} alt="Original Image"/>
                                     </td>
                                     <td>
-                                        <img
-                                            className="prototypeImagePath"
-                                            src={`/results_images/${analysisResults.imgdir}/${index + 1}/activated`}
-                                            alt="Prototype Image"
-                                        />
+                                        <img className="prototypeImagePath" src={`/results_images/${imgdir}/${index + 1}/activated`} alt="Prototype Image"/>
                                     </td>
                                     <td>
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name={`correctness_${index}`}
-                                                value="yes"
-                                                checked={correctnessFeedback[index] === 'yes'}
-                                                onChange={() => handleFeedbackChange(index, 'yes')}
-                                            />
-                                            Yes
-                                        </label>
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name={`correctness_${index}`}
-                                                value="no"
-                                                checked={correctnessFeedback[index] === 'no'}
-                                                onChange={() => handleFeedbackChange(index, 'no')}
-                                            />
-                                            No
-                                        </label>
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name={`correctness_${index}`}
-                                                value="idk"
-                                                checked={correctnessFeedback[index] === 'idk'}
-                                                onChange={() => handleFeedbackChange(index, 'idk')}
-                                            />
-                                            I don't know
-                                        </label>
+                                        <label><input type="radio" name={`correctness_${index + 1}`} value="yes" /> Yes</label>
+                                        <label><input type="radio" name={`correctness_${index + 1}`} value="no"/> No</label>
+                                        <label><input type="radio" name={`correctness_${index + 1}`} value="idk" /> I don't know</label>
                                     </td>
                                 </tr>
                             ))}
@@ -167,18 +111,14 @@ function AnalysisResults() {
                     </div>
                 </div>
                 <div className="next-button">
-                    <button className="action-button" onClick={saveFeedbackAndContinue}>
-                        Save & Continue
-                    </button>
+                    <button className="action-button" onClick={saveFeedbackAndRedirect}>Save & Continue</button>
                 </div>
             </div>
 
             {/* Display any errors */}
-            {analysisResults.error && (
-                <p style={{ color: 'red' }}>{analysisResults.error}</p>
-            )}
+            {error && <p style={{color: 'red'}}>{error}</p>}
         </div>
     );
 }
 
-export default AnalysisResults;
+export default Results;
