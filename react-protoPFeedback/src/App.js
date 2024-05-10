@@ -7,6 +7,7 @@ import HomeForRegisteredUser from "./pages/HomeForRegisteredUser";
 import AboutUs from "./pages/AboutUs";
 import BirdSelection from "./pages/BirdSelection";
 import Results from "./pages/Results";
+import ResultsContainer from "./components/ResultsContainer";
 
 function App() {
     return (
@@ -18,7 +19,8 @@ function App() {
                 <Route path="/home" element={<HomeForRegisteredUser />} />
                 <Route path="/about-us" element={<AboutUs />} />
                 <Route path="/picture-selection" element={<BirdSelection />} />
-                <Route path="/results" element={<Results />} />
+                <Route path="/results" element={<ResultsContainer />} />
+                <Route path="/analyze-next" element={<Results />} />
             </Routes>
         </BrowserRouter>
     );
