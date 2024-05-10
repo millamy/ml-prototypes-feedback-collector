@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -82,91 +84,214 @@ public class ImageController {
     }
 
 
-    //Connecting with model
+    // --- THAT'S THE ORIGINAL FUNCTION, LEAVING HERE JUST IN CASE !---
+
+//    @CrossOrigin(origins = "http://localhost:3000")
+//    @PostMapping("/selected-pictures")
+//    @ResponseBody
+//    public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind, @RequestParam(required = false) String[] birdNames, Model model, HttpSession session) {
+//        String[] imageUrls = selectedImageUrl.split(";");
+//        Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
+//        if (currentImageIndex == null) {
+//            currentImageIndex = 0;
+//        }
+//
+//        if (currentImageIndex < imageUrls.length) {
+//            String imageUrl = imageUrls[currentImageIndex];
+//            String[] parts = imageUrl.split("/");
+//            String imgclassStr = parts[parts.length - 2].substring(0, 3);
+//            int originalImgclass = Integer.parseInt(imgclassStr);
+//            int imgclass = originalImgclass - 1;
+//            String imgdir = parts[parts.length - 2];
+//            String img = parts[parts.length - 1];
+//
+//             System.out.println("imgclassStr: " + imgclassStr + "\norignalImgclass: " + originalImgclass
+//                     + "\nimgclass: " + imgclass + "\nimgdir: " + imgdir + "\nimg: " + img + "\n\n");
+//
+//            String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH + " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH + imgdir + " -img " + img + " -imgclass " + imgclass;
+//
+//            ProcessBuilder builder;
+//
+//            if (System.getProperty("os.name").startsWith("Windows")) {
+//                builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
+//            } else {
+//                builder = new ProcessBuilder("python3", LOCAL_ANALYSIS_PATH, "-modeldir", MODELDIR_PATH, "-model", MODEL_PATH, "-imgdir", STATIC_IMAGES_PATH + imgdir, "-img", img, "-imgclass", String.valueOf(imgclass));
+//            }
+//
+//            try {
+//                builder.redirectErrorStream(true);
+//                Process process = builder.start();
+//
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//                StringBuilder output = new StringBuilder();
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    output.append(line).append("\n");
+//                }
+//
+//                int exitCode = process.waitFor();
+//                Map<String, Object> response = new HashMap<>();
+//
+//                if (exitCode == 0) {
+//                    String[] resultsLines = output.toString().split("\\n");
+//                    String predictedClass = resultsLines[8].substring(resultsLines[8].indexOf(":") + 1).trim();
+//
+//                    List<Map<String, String>> prototypes = new ArrayList<>();
+//
+//                    String[] prototypeInfo = resultsLines[13].split(":");
+//                    Map<String, String> prototypeMap = new HashMap<>();
+//                    prototypeMap.put("index", prototypeInfo[1].trim());
+//                    prototypeMap.put("classIdentity", prototypeInfo[1].trim());
+//                    prototypes.add(prototypeMap);
+//
+//                    // Uncomment to get output to the terminal
+//                    //System.out.println(output + "\n\n");
+//
+//                    model.addAttribute("birdNames", getBirdProcessedNames(birdNames));
+//                    model.addAttribute("predictedClass", Integer.parseInt(prototypeInfo[1].trim()));
+//                    model.addAttribute("analysisResults", output.toString());
+//                    model.addAttribute("originalImgclass", originalImgclass);
+//                    model.addAttribute("imgdir", imgdir);
+//                    model.addAttribute("img", img);
+//
+//                } else {
+//                    model.addAttribute("error", "Error executing the analysis command. Exit code: " + exitCode);
+//                    return "Results";
+//                }
+//            } catch (IOException | InterruptedException e) {
+//                e.printStackTrace();
+//                model.addAttribute("error", "Error executing the analysis command: " + e.getMessage());
+//                return "Results";
+//            }
+//            session.setAttribute("currentImageIndex", currentImageIndex);
+//            session.setAttribute("selectedImageUrls", selectedImageUrl);
+//        } else {
+//            session.removeAttribute("currentImageIndex");
+//            session.removeAttribute("selectedImageUrls");
+//            return "redirect:/picture-selection";
+//        }
+//        return "Results";
+//    }
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/selected-pictures")
-    public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind, @RequestParam(required = false) String[] birdNames, Model model, HttpSession session) {
-        String[] imageUrls = selectedImageUrl.split(";");
-        Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
-        if (currentImageIndex == null) {
-            currentImageIndex = 0;
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> handlePostRequest(@RequestBody Map<String, Object> requestData, HttpSession session) {
+        logger.info("handlePostRequest method started");
+        String selectedImageUrl = (String) requestData.get("selectedImageUrl");
+        String birdKind = (String) requestData.get("birdKind");
+        List<String> birdNames = (List<String>) requestData.get("birdNames");
+
+        if (selectedImageUrl == null || birdKind == null || birdNames == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Missing required parameters: selectedImageUrl and birdKind"));
         }
 
-        if (currentImageIndex < imageUrls.length) {
-            String imageUrl = imageUrls[currentImageIndex];
-            String[] parts = imageUrl.split("/");
-            String imgclassStr = parts[parts.length - 2].substring(0, 3);
-            int originalImgclass = Integer.parseInt(imgclassStr);
-            int imgclass = originalImgclass - 1;
-            String imgdir = parts[parts.length - 2];
-            String img = parts[parts.length - 1];
+        logger.info("handlePostRequest method completed successfully");
 
-            // System.out.println("imgclassStr: " + imgclassStr + "\norignalImgclass: " + originalImgclass
-            //         + "\nimgclass: " + imgclass + "\nimgdir: " + imgdir + "\nimg: " + img + "\n\n");
+        return analyzeImage(selectedImageUrl,birdKind,birdNames, session);
 
-            String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH + " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH + imgdir + " -img " + img + " -imgclass " + imgclass;
-
-            ProcessBuilder builder;
-
-            if (System.getProperty("os.name").startsWith("Windows")) {
-                builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
-            } else {
-                builder = new ProcessBuilder("python3", LOCAL_ANALYSIS_PATH, "-modeldir", MODELDIR_PATH, "-model", MODEL_PATH, "-imgdir", STATIC_IMAGES_PATH + imgdir, "-img", img, "-imgclass", String.valueOf(imgclass));
-            }
-
-            try {
-                builder.redirectErrorStream(true);
-                Process process = builder.start();
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                StringBuilder output = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    output.append(line).append("\n");
-                }
-
-                int exitCode = process.waitFor();
-
-                if (exitCode == 0) {
-                    String[] resultsLines = output.toString().split("\\n");
-                    String predictedClass = resultsLines[8].substring(resultsLines[8].indexOf(":") + 1).trim();
-
-                    List<Map<String, String>> prototypes = new ArrayList<>();
-
-                    String[] prototypeInfo = resultsLines[13].split(":");
-                    Map<String, String> prototypeMap = new HashMap<>();
-                    prototypeMap.put("index", prototypeInfo[1].trim());
-                    prototypeMap.put("classIdentity", prototypeInfo[1].trim());
-                    prototypes.add(prototypeMap);
-
-                    // Uncomment to get output to the terminal
-                    //System.out.println(output + "\n\n");
-
-                    model.addAttribute("birdNames", getBirdProcessedNames(birdNames));
-                    model.addAttribute("predictedClass", Integer.parseInt(prototypeInfo[1].trim()));
-                    model.addAttribute("analysisResults", output.toString());
-                    model.addAttribute("originalImgclass", originalImgclass);
-                    model.addAttribute("imgdir", imgdir);
-                    model.addAttribute("img", img);
-
-                } else {
-                    model.addAttribute("error", "Error executing the analysis command. Exit code: " + exitCode);
-                    return "Results";
-                }
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-                model.addAttribute("error", "Error executing the analysis command: " + e.getMessage());
-                return "Results";
-            }
-            session.setAttribute("currentImageIndex", currentImageIndex);
-            session.setAttribute("selectedImageUrls", selectedImageUrl);
-        } else {
-            session.removeAttribute("currentImageIndex");
-            session.removeAttribute("selectedImageUrls");
-            return "redirect:/picture-selection";
-        }
-        return "Results";
     }
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/selected-pictures")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> handleGetRequest(HttpSession session) {
+        logger.info("Session ID in handleGetRequest: " + session.getId());
+//        System.out.println(session.getAttribute("analysisResults"));
+
+        Map<String, Object> analysisResults = (Map<String, Object>) session.getAttribute("analysisResults");
+
+        if (analysisResults == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "No analysis results available"));
+        }
+
+        return ResponseEntity.ok(analysisResults);
+    }
+
+    private ResponseEntity<Map<String, Object>> analyzeImage(String selectedImageUrl, String birdKind,List<String> birdNames, HttpSession session) {
+        logger.info("Session ID in analyzeImage: " + session.getId());
+        logger.info("analyzeImage method started");
+
+        String[] imageUrls = selectedImageUrl.split(";");
+
+        // CHANGED HERE TO 0 AS WE ARE ANALYSING ONLY ONE IMAGE FOR NOW
+        // MAY NEED TO CHANGE LATER!!!!
+        Integer currentImageIndex = 0;
+
+
+        if (currentImageIndex >= imageUrls.length) {
+            logger.info("No more images to analyze. Ending analysis.");
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Analysis completed. No more images to analyze.");
+            return ResponseEntity.ok(response);
+        }
+
+        String imageUrl = imageUrls[currentImageIndex];
+        String[] parts = imageUrl.split("/");
+        String imgclassStr = parts[parts.length - 2].substring(0, 3);
+        int originalImgclass = Integer.parseInt(imgclassStr);
+        int imgclass = originalImgclass - 1;
+        String imgdir = parts[parts.length - 2];
+        String img = parts[parts.length - 1];
+
+        String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH + " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH + imgdir + " -img " + img + " -imgclass " + imgclass;
+
+        ProcessBuilder builder;
+
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
+        } else {
+            builder = new ProcessBuilder("python3", LOCAL_ANALYSIS_PATH, "-modeldir", MODELDIR_PATH, "-model", MODEL_PATH, "-imgdir", STATIC_IMAGES_PATH + imgdir, "-img", img, "-imgclass", String.valueOf(imgclass));
+        }
+
+        try {
+            builder.redirectErrorStream(true);
+            Process process = builder.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+
+            int exitCode = process.waitFor();
+
+            Map<String, Object> response = new HashMap<>();
+
+            if (exitCode == 0) {
+                String[] resultsLines = output.toString().split("\\n");
+                String predictedClass = resultsLines[8].substring(resultsLines[8].indexOf(":") + 1).trim();
+
+                response.put("birdKind", birdKind);
+                response.put("predictedClass", Integer.parseInt(predictedClass));
+                response.put("originalImgclass", originalImgclass);
+                response.put("imgdir", imgdir);
+                response.put("img", img);
+                response.put("birdNames", birdNames);
+
+                session.setAttribute("analysisResults", null);
+                session.setAttribute("analysisResults", response);
+                System.out.println("Analysis results: " + response);
+
+                session.setAttribute("currentImageIndex", currentImageIndex + 1);
+                logger.info("analyzeImage method completed successfully");
+
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("error", "Error executing the analysis command. Exit code: " + exitCode);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", "Error executing the analysis command: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+
 
 // --- only selecting one picture for now ----
 
@@ -259,4 +384,6 @@ public class ImageController {
         }
         return ResponseEntity.notFound().build();
     }
-}
+
+
+   }
