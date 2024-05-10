@@ -1,42 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import '../style.css';
 
-
-function PictureSelection() {
+function BirdSelection() {
     const [birdNames, setBirdNames] = useState([]);
-    const [selectedBird, setSelectedBird] = useState('');
+    const [birdKind, setBirdKind] = useState('');
     const [birdImages, setBirdImages] = useState([]);
     const [selectedImages, setSelectedImages] = useState([]);
     const maxSelectedImages = 1;
+    const navigate = useNavigate();
 
-    // Fetch bird names from the Spring Boot backend
     useEffect(() => {
         fetch('/api/bird-names')
             .then(response => response.json())
             .then(data => {
                 setBirdNames(data);
                 if (data.length > 0) {
-                    setSelectedBird(data[0]);
+                    setBirdKind(data[0]);
                 }
             })
             .catch(error => console.error('Error fetching bird names:', error));
     }, []);
 
     useEffect(() => {
-        if (selectedBird) {
-            fetch(`/images/${selectedBird}`)
+        if (birdKind) {
+            fetch(`/images/${birdKind}`)
                 .then(response => response.json())
                 .then(data => setBirdImages(data))
                 .catch(error => console.error('Error fetching images:', error));
         }
-    }, [selectedBird]);
+    }, [birdKind]);
 
     function handleBirdChange(event) {
-        setSelectedBird(event.target.value);
+        setBirdKind(event.target.value);
     }
-
 
     function handleImageClick(imagePath) {
         if (selectedImages.includes(imagePath)) {
@@ -54,80 +51,64 @@ function PictureSelection() {
         event.preventDefault();
 
         const selectedImageUrl = selectedImages.length > 0 ? selectedImages[0] : '';
-        const formData = new FormData();
-        formData.append('selectedImageUrl', selectedImageUrl);
-        formData.append('birdKind', selectedBird);
-        formData.append('birdNames', JSON.stringify(birdNames));
-
         fetch('http://localhost:8080/selected-pictures', {
             method: 'POST',
-            body: formData,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                selectedImageUrl: selectedImageUrl,
+                birdKind: birdKind,
+                birdNames: birdNames
+            }),
+            credentials: 'include',
         })
-            .then(response => {
-                if (response.ok) {
-                    // Handle successful submission (e.g., show a success message or redirect)
-                    console.log('Submission successful');
-                } else {
-                    // Handle error
-                    console.error('Submission failed');
-                }
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+                navigate('/results');
             })
-            .catch(error => {
-                console.error('Error during submission:', error);
-            });
+            .catch(error => console.error('Error:', error));
     };
 
-    function formatBirdName(name) {
-        return name.replace(/(\d+\.)|_/g, ' ').trim();
-    }
+
 
     return (
-        <div>
-            <div className="header">
-                <nav>
-                    <ul>
-                        <div className="white-box-header"><a href="/home">Home</a></div>
-                        <div className="white-box-header"><a href="/about-us">About Us</a></div>
-                    </ul>
-                </nav>
-            </div>
-
-            <div className="content-container">
-                <div className="white-box">
-                    <h2>Please select a bird kind</h2>
-                    <form onSubmit={handleSubmit}>
-                        <label htmlFor="birdKind">Available bird kinds:</label>
-                        <select
-                            id="birdKind"
-                            name="birdKind"
-                            value={selectedBird}
-                            onChange={handleBirdChange}
-                        >
-                            {birdNames.map(birdName => (
-                                <option key={birdName} value={birdName}>
-                                    {formatBirdName(birdName)}
-                                </option>
-                            ))}
-                        </select>
-                        <br />
-                        <div id="birdsImagesGrid" className="image-grid">
-                            {birdImages.map(record => (
-                                <img
-                                    key={record.folderPath}
-                                    src={`data:image/jpeg;base64,${record.imageData}`}
-                                    alt="Bird Image"
-                                    className={`image-item ${selectedImages.includes(record.folderPath) ? 'selected' : ''}`}
-                                    onClick={() => handleImageClick(record.folderPath)}
-                                />
-                            ))}
-                        </div>
-                        <input type="hidden" id="selectedImageUrl" name="selectedImageUrl" value={selectedImages.join(';')} />
-                        <button type="submit">Submit</button>
-                    </form>
-                </div>
+        <div className="content-container">
+            <div className="white-box">
+                <h2>Please select a bird kind</h2>
+                <form onSubmit={handleSubmit}>
+                    <label htmlFor="birdKind">Available bird kinds:</label>
+                    <select
+                        id="birdKind"
+                        name="birdKind"
+                        value={birdKind}
+                        onChange={handleBirdChange}
+                    >
+                        {birdNames.map(birdName => (
+                            <option key={birdName} value={birdName}>
+                                {birdName}
+                            </option>
+                        ))}
+                    </select>
+                    <br />
+                    <div id="birdsImagesGrid" className="image-grid">
+                        {birdImages.map(record => (
+                            <img
+                                key={record.folderPath}
+                                src={`data:image/jpeg;base64,${record.imageData}`}
+                                alt="Bird Image"
+                                className={`image-item ${selectedImages.includes(record.folderPath) ? 'selected' : ''}`}
+                                onClick={() => handleImageClick(record.folderPath)}
+                            />
+                        ))}
+                    </div>
+                    <button type="submit">Submit</button>
+                </form>
             </div>
         </div>
     );
 }
 
-export default PictureSelection;
+export default BirdSelection;
