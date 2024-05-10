@@ -21,7 +21,7 @@ import org.springframework.security.config.Customizer;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-        private final CustomUserDetailsService customUserDetailsService;
+
 
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -69,4 +69,18 @@ public class WebSecurityConfig {
                 };
         }
 
+
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**")
+//                        .allowedOrigins("http://localhost:3000")
+//                        .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+//                        .allowedHeaders("*")
+//                        .allowCredentials(true);
+//            }
+//        };
+//    }
 }
