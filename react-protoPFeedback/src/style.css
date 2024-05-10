@@ -341,6 +341,7 @@ select:focus {
     text-align: left;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border: 2px solid #4CAF50;
+    margin-top: 150px;
 }
 
 .center-container {
