@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom';
 import '../style.css';
 
 function Results({ birdNames, originalImgclass, predictedClass, imgdir, error }) {
@@ -58,10 +58,8 @@ function Results({ birdNames, originalImgclass, predictedClass, imgdir, error })
         document.body.removeChild(a);
     };
 
-
     return (
-        <div>
-
+        <body>
             <div className="header">
                 <nav>
                     <ul>
@@ -71,7 +69,7 @@ function Results({ birdNames, originalImgclass, predictedClass, imgdir, error })
                 </nav>
             </div>
             <div className="results-container">
-                <div className="analysis-box">
+                <div d="analysis-results" className="analysis-box">
                     <h1 className="title">Analysis Results</h1>
                     {birdNames && (
                         <div>
@@ -83,19 +81,19 @@ function Results({ birdNames, originalImgclass, predictedClass, imgdir, error })
             </div>
 
             <div className="center-container">
-                <div className="white-box">
+                <div id="white-results-box" className="white-box">
                     <h2>Top 10 Most Activated Prototypes</h2>
                     <div className="scrollable-table">
-                        <table border="1">
+                        <table className="results-table">
                             <thead>
                             <tr>
-                                <th style={{width: '35%'}}>Original Image</th>
-                                <th style={{width: '35%'}}>Prototype Image</th>
-                                <th style={{width: '30%'}}>Correctness</th>
+                                <th style={{ width: '35%' }}>Original Image</th>
+                                <th style={{ width: '35%' }}>Prototype Image</th>
+                                <th style={{ width: '30%' }}>Correctness</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {Array.from({length: 10}, (_, index) => (
+                            {Array.from({ length: 10 }, (_, index) => (
                                 <tr key={index}>
                                     <td>
                                         <img className="originalImagePath"
@@ -108,12 +106,13 @@ function Results({ birdNames, originalImgclass, predictedClass, imgdir, error })
                                              alt="Prototype Image"/>
                                     </td>
                                     <td>
-                                        <label><input type="radio" name={`correctness_${index + 1}`}
-                                                      value="yes"/> Yes</label>
-                                        <label><input type="radio" name={`correctness_${index + 1}`}
-                                                      value="no"/> No</label>
-                                        <label><input type="radio" name={`correctness_${index + 1}`} value="idk"/> I
-                                            don't know</label>
+                                        <div className="radio-group">
+                                            <label><input type="radio" name={`correctness_${index + 1}`}
+                                                          value="yes"/> Yes</label>
+                                            <label><input type="radio" name={`correctness_${index + 1}`} value="no"/> No</label>
+                                            <label><input type="radio" name={`correctness_${index + 1}`} value="idk"/> I
+                                                don't know</label>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -121,15 +120,15 @@ function Results({ birdNames, originalImgclass, predictedClass, imgdir, error })
                         </table>
                     </div>
                 </div>
-                <div className="next-button">
-                    <button className="action-button" onClick={saveFeedback}>Save results to CSV</button>
+                <div id="results-buttons" className="button-container">
+                    <button className="action-button" onClick={saveFeedback}>Save Results to CSV</button>
                     <Link to="/picture-selection">
                         <button className="action-button">Analyze More</button>
                     </Link>
                 </div>
             </div>
-            {error && <p style={{color: 'red'}}>{error}</p>}
-        </div>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+        </body>
     );
 }
 
