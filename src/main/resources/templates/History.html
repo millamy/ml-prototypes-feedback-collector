@@ -298,7 +298,59 @@
         document.body.removeChild(link);
     }
 
-   
+    document.addEventListener('DOMContentLoaded', function() {
+        var canvas = document.getElementById('imageCanvas');
+        var ctx = canvas.getContext('2d');
+        var points = [];
+        var isDrawing = false;
+
+        canvas.addEventListener('mousedown', function(e) {
+            var rect = canvas.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            isDrawing = true;
+            points.push({ x: x, y: y });
+            drawPoints();
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+            if (!isDrawing) return;
+            var rect = canvas.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            points.push({ x: x, y: y });
+            drawPoints();
+        });
+
+        canvas.addEventListener('mouseup', function() {
+            isDrawing = false;
+            // Optionally close the path automatically
+            if (points.length > 1) {
+                ctx.lineTo(points[0].x, points[0].y);
+                ctx.stroke();
+            }
+        });
+
+        canvas.addEventListener('mouseleave', function() {
+            isDrawing = false;
+        });
+
+        function drawPoints() {
+            if (points.length < 2) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            points.forEach((point, index) => {
+                if (index > 0) ctx.lineTo(point.x, point.y);
+            });
+            ctx.stroke();
+        }
+
+        window.clearCanvas = function() {
+            points = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    });
 
 
 </script>

@@ -1,5 +1,6 @@
 package protopnet.mlprototypesfeedbackcollector.model;
 import jakarta.websocket.Decoder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -9,22 +10,22 @@ import org.bson.types.Binary;
 @Document(collection = "feedback")
 @Getter
 @Setter
+@Data
 public class FeedbackData {
     @Id
     private String id;
-
     private String username;
     private String imageClass;
     private String predictedImageClass;
-
     private Binary originalImage;
-
     private Binary prototypeImage;
-
     private String originalImagePath;
-
     private String prototypeImagePath;
     private String correctness;
+    private Integer selectionX;
+    private Integer selectionY;
+    private Integer selectionWidth;
+    private Integer selectionHeight;
 
 
 
