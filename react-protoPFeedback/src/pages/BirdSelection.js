@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import '../style.css';
 
 function BirdSelection() {
@@ -72,7 +72,7 @@ function BirdSelection() {
             .catch(error => console.error('Error:', error));
     };
 
-
+    const cleanedBirdNames = birdNames.map(name => name.replace(/^\d{3}\./, '').replace(/_/g, ' '));
 
     return (
         <div className="content-container">
@@ -86,13 +86,13 @@ function BirdSelection() {
                         value={birdKind}
                         onChange={handleBirdChange}
                     >
-                        {birdNames.map(birdName => (
+                        {birdNames.map((birdName, index) => (
                             <option key={birdName} value={birdName}>
-                                {birdName}
+                                {cleanedBirdNames[index]}
                             </option>
                         ))}
                     </select>
-                    <br />
+                    <br/>
                     <div id="birdsImagesGrid" className="image-grid">
                         {birdImages.map(record => (
                             <img

@@ -20,7 +20,6 @@ function App() {
                 <Route path="/about-us" element={<AboutUs />} />
                 <Route path="/picture-selection" element={<BirdSelection />} />
                 <Route path="/results" element={<ResultsContainer />} />
-                <Route path="/analyze-next" element={<Results />} />
             </Routes>
         </BrowserRouter>
     );
