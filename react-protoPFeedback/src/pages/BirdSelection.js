@@ -32,23 +32,24 @@ function BirdSelection() {
     }, [birdKind]);
 
     function handleBirdChange(event) {
-        setBirdKind(event.target.value);
+        const newBirdKind = event.target.value;
+        if (newBirdKind !== birdKind) {
+            setSelectedImages([]);
+        }
+        setBirdKind(newBirdKind);
     }
 
     function handleImageClick(imagePath) {
-        if (selectedImages.includes(imagePath)) {
-            setSelectedImages(prevImages => prevImages.filter(image => image !== imagePath));
-        } else {
-            if (selectedImages.length < maxSelectedImages) {
-                setSelectedImages(prevImages => [...prevImages, imagePath]);
-            } else {
-                alert('You can only select only one picture');
-            }
-        }
+        setSelectedImages([imagePath]);
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
+
+        if (selectedImages.length === 0) {
+            alert('Please select an image before submitting.');
+            return;
+        }
 
         const selectedImageUrl = selectedImages.length > 0 ? selectedImages[0] : '';
         fetch('http://localhost:8080/selected-pictures', {
