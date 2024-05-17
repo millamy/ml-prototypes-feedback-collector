@@ -813,48 +813,67 @@ select:focus {
     background-color: rgba(255, 0, 0, 0.2);
 }
 
-/* style.css */
+/* Quiz page */
+body.modal-open {
+    overflow: hidden;
+    display: flow;
+    position: fixed;
+}
+
 .game-container {
+    align-items: center;
     text-align: center;
-    margin: 0 auto;
+    margin-top: 100px;
     max-width: 800px;
     padding: 20px;
-    display: block;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .game-container p {
-    font-size: 20px;
-    color: #333333;
+    font-size: 18px;
+    color: #333;
+    position: relative;
+}
+
+.score-increment {
+    position: absolute;
+    align-items: center;
+    font-size: 72px;
+    font-weight: bold;
+    color: #6ad36d;
 }
 
 .quiz-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 400px;
 }
 
 .bird-image {
-    max-height: 600px;
     width: 600px;
     height: auto;
+    max-height: 600px;
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 7px solid #313a92;
+    border: 5px solid #4952af;
     transition: transform 0.3s ease;
 }
 
 .options {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 20px;
 }
 
 .options button {
     font-size: 22px;
     padding: 10px 20px;
-    background-color: #c7e1f1;
-    color: #000000;
+    background-color: #4952af;
+    color: #ffffff;
     text-decoration: none;
     border: none;
     border-radius: 5px;
@@ -864,6 +883,12 @@ select:focus {
 }
 
 .options button:hover {
-    background-color: #c7e1f1;
+    background-color: rgba(73, 82, 175, 0.78);
     transform: scale(1.05);
+}
+
+.success-popup, .error-popup {
+    font-size: 18px;
+    border-radius: 8px;
+    padding: 20px;
 }
