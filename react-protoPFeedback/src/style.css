@@ -813,3 +813,57 @@ select:focus {
     background-color: rgba(255, 0, 0, 0.2);
 }
 
+/* style.css */
+.game-container {
+    text-align: center;
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 20px;
+    display: block;
+}
+
+.game-container p {
+    font-size: 20px;
+    color: #333333;
+}
+
+.quiz-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bird-image {
+    max-height: 600px;
+    width: 600px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 7px solid #313a92;
+    transition: transform 0.3s ease;
+}
+
+.options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.options button {
+    font-size: 22px;
+    padding: 10px 20px;
+    background-color: #c7e1f1;
+    color: #000000;
+    text-decoration: none;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.options button:hover {
+    background-color: #c7e1f1;
+    transform: scale(1.05);
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import '../style.css';
 
 function AboutUs() {
@@ -10,6 +10,8 @@ function AboutUs() {
                     <ul>
                         <div className="white-box-header"><a href="/home">Home</a></div>
                         <div className="white-box-header"><a href="/picture-selection">Bird Selection</a></div>
+                        <div className="white-box-header"><a href="/game">Game</a></div>
+                        <div className="white-box-header sign-out"><Link to="/">Sign Out</Link></div>
                     </ul>
                 </nav>
             </div>

@@ -6,7 +6,7 @@ import Register from './pages/Register';
 import HomeForRegisteredUser from "./pages/HomeForRegisteredUser";
 import AboutUs from "./pages/AboutUs";
 import BirdSelection from "./pages/BirdSelection";
-import Results from "./pages/Results";
+import Game from './pages/Game';
 import ResultsContainer from "./components/ResultsContainer";
 
 function App() {
@@ -19,6 +19,7 @@ function App() {
                 <Route path="/home" element={<HomeForRegisteredUser />} />
                 <Route path="/about-us" element={<AboutUs />} />
                 <Route path="/picture-selection" element={<BirdSelection />} />
+                <Route path="/game" element={<Game />} />
                 <Route path="/results" element={<ResultsContainer />} />
             </Routes>
         </BrowserRouter>

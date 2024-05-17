@@ -100,6 +100,7 @@ function BirdSelection() {
                     <ul>
                         <div className="white-box-header"><a href="/home">Home</a></div>
                         <div className="white-box-header"><a href="/about-us">About Us</a></div>
+                        <div className="white-box-header"><a href="/game">Game</a></div>
                         <div className="white-box-header sign-out"><Link to="/">Sign Out</Link></div>
                     </ul>
                 </nav>

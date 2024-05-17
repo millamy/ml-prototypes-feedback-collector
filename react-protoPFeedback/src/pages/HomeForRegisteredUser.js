@@ -10,6 +10,7 @@ function HomeForRegisteredUser() {
                     <ul>
                         <div className="white-box-header"><Link to="/about-us">About Us</Link></div>
                         <div className="white-box-header"><Link to="/picture-selection">Bird Selection</Link></div>
+                        <div className="white-box-header"><a href="/game">Game</a></div>
                         <div className="white-box-header sign-out"><Link to="/">Sign Out</Link></div>
                     </ul>
                 </nav>

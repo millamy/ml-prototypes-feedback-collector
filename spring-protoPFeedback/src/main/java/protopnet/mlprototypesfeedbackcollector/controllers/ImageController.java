@@ -174,6 +174,7 @@ public class ImageController {
 //    }
 
     private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
+
     @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/selected-pictures")
     @ResponseBody
@@ -189,7 +190,7 @@ public class ImageController {
 
         logger.info("handlePostRequest method completed successfully");
 
-        return analyzeImage(selectedImageUrl,birdKind,birdNames, session);
+        return analyzeImage(selectedImageUrl, birdKind, birdNames, session);
 
     }
 
@@ -209,7 +210,7 @@ public class ImageController {
         return ResponseEntity.ok(analysisResults);
     }
 
-    private ResponseEntity<Map<String, Object>> analyzeImage(String selectedImageUrl, String birdKind,List<String> birdNames, HttpSession session) {
+    private ResponseEntity<Map<String, Object>> analyzeImage(String selectedImageUrl, String birdKind, List<String> birdNames, HttpSession session) {
         logger.info("Session ID in analyzeImage: " + session.getId());
         logger.info("analyzeImage method started");
 
@@ -291,24 +292,6 @@ public class ImageController {
         }
     }
 
-
-
-// --- only selecting one picture for now ----
-
-//    @CrossOrigin(origins = "http://localhost:3000")
-//    @GetMapping("/analyze-next")
-//    public String analyzeNextImage(HttpSession session, Model model) {
-//        Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
-//        String selectedImageUrls = (String) session.getAttribute("selectedImageUrls");
-//
-//        if (currentImageIndex != null && selectedImageUrls != null) {
-//            session.setAttribute("currentImageIndex", currentImageIndex + 1);
-//            return analyzeSelectedPictures(selectedImageUrls, null, model, session);
-//        } else {
-//            return "redirect:/picture-selection";
-//        }
-//    }
-
     //Fetching images
     @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/images/{folderName}")
@@ -385,5 +368,50 @@ public class ImageController {
         return ResponseEntity.notFound().build();
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/api/random-bird")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> getRandomBird() {
+        File birdPictureFolder = new File(STATIC_IMAGES_PATH);
+        if (birdPictureFolder.exists() && birdPictureFolder.isDirectory()) {
+            String[] birdFolders = birdPictureFolder.list();
+            if (birdFolders != null && birdFolders.length > 0) {
+                birdFolders = Arrays.stream(birdFolders)
+                        .filter(name -> name.matches("\\d{3}.*"))
+                        .toArray(String[]::new);
+                if (birdFolders.length == 0) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "No bird folders found"));
+                }
 
-   }
+                Random random = new Random();
+                String randomBirdFolder = birdFolders[random.nextInt(birdFolders.length)];
+
+                File birdFolder = new File(STATIC_IMAGES_PATH + randomBirdFolder);
+                if (birdFolder.exists() && birdFolder.isDirectory()) {
+                    File[] birdImages = birdFolder.listFiles();
+                    if (birdImages != null && birdImages.length > 0) {
+                        File randomImage = birdImages[random.nextInt(birdImages.length)];
+                        if (randomImage.isFile()) {
+                            try {
+                                byte[] imageData = Files.readAllBytes(randomImage.toPath());
+                                String base64Image = Base64.getEncoder().encodeToString(imageData);
+
+                                Map<String, String> birdData = new HashMap<>();
+                                birdData.put("imageData", base64Image);
+                                birdData.put("imageName", randomBirdFolder.substring(randomBirdFolder.indexOf('.') + 1).replace('_', ' '));
+                                birdData.put("imagePath", randomBirdFolder + "/" + randomImage.getName());
+
+                                return ResponseEntity.ok(birdData);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Error reading bird image"));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "No bird images found"));
+    }
+
+}
