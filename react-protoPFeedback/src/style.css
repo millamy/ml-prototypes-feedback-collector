@@ -95,12 +95,6 @@ body {
     margin-bottom: 20px;
 }
 
-.button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
 .action-button {
     font-size: 18px;
     padding: 10px 20px;
@@ -110,6 +104,7 @@ body {
     border-radius: 5px;
     transition: background-color 0.3s ease, transform 0.3s ease;
     cursor: pointer;
+    margin: 5px;
 }
 
 .action-button:hover {
@@ -163,14 +158,14 @@ body {
 /*Register page*/
 
 .register-container {
-    background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     text-align: center;
-}
-
-.register-container h2 {
-    color: #333333;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
 }
 
 .register-container form {
@@ -264,6 +259,7 @@ body {
     border-radius: 4px;
     box-sizing: border-box;
 }
+
 .image-grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
@@ -314,6 +310,7 @@ select {
     font-size: 16px;
     cursor: pointer;
 }
+
 .button-container {
     display: flex;
     justify-content: center;
@@ -363,6 +360,7 @@ select:focus {
     width: 100%;
     /*background: rgba(52, 179, 225, 0.51);*/
 }
+
 .header nav {
     display: flex;
     justify-content: space-between;
@@ -409,13 +407,18 @@ select:focus {
     margin-left: auto;
 }
 
-
 /*result page*/
 .results-container {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-right: 100px;
+    flex-direction: row;
+    align-items: center;
+}
+
+#analysis-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
 }
 
 .analysis-box {
@@ -438,8 +441,13 @@ select:focus {
 .title {
     font-size: 20px;
 }
+
 .image-info {
     font-size: 18px;
+}
+
+#originalImageClass, #predictedImageClass {
+    font-weight: bold;
 }
 
 .scrollable-table {
@@ -486,6 +494,10 @@ select:focus {
 
 .results-table tr:hover {
     background-color: #d1e7dd;
+}
+
+.results-table tr.unanswered {
+    background-color: #e7d1d1;
 }
 
 .results-table tr:first-child th:first-child {
@@ -541,8 +553,12 @@ select:focus {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .content-container {
@@ -553,28 +569,108 @@ select:focus {
     filter: blur(2px);
 }
 
-#results-buttons {
+/* radio buttons style */
+.radio-group {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
-    margin: 20px;
+}
+
+.radio-group label {
+    cursor: pointer;
+    text-align: start;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#left-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.register-container input[type="text"],
+.register-container input[type="email"],
+.register-container input[type="password"],
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.register-container .button-container {
+    text-align: center;
+}
+
+.register-container button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.register-container button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+#login-text {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#login-text a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+#login-text a:hover {
+    text-decoration: underline;
+}
+
+#register-button {
+    font-size: 20px;
+    padding: 10px 50px;
+    background-color: #4CAF50;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 20px;
 }
 
 /* radio buttons style */
 .radio-group {
+    display: flex;
     flex-direction: column;
-    width: fit-content;
-    justify-items: center;
+    align-items: flex-start;
+    gap: 10px;
 }
 
 .radio-group label {
-    gap: 5px;
     cursor: pointer;
-    align-items: center;
     text-align: start;
-    margin-bottom: 10px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#results-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
 .radio-group input[type="radio"] {
@@ -586,6 +682,8 @@ select:focus {
     outline: none;
     cursor: pointer;
     transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-right: 8px;
+    vertical-align: middle;
 }
 
 .radio-group input[type="radio"]:checked {
@@ -624,8 +722,6 @@ select:focus {
     color: #333;
 }
 
-
-
 .my-confirm-button {
     background-color: #4CAF50;
     color: #ffffff;
@@ -638,3 +734,82 @@ select:focus {
 .my-confirm-button:hover {
     background-color: #45a049;
 }
+
+.register-container h2 {
+    text-align: center;
+    color: #333;
+}
+
+.register-container .error {
+    color: red;
+    font-size: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+
+#analysis-results-buttons {
+    flex-direction: row;
+    margin-right: 20px;
+}
+
+.originalImagePath, .prototypeImagePath {
+    width: 200px;
+    height: 200px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.originalImagePath:hover, .prototypeImagePath:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.popup-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-container.show {
+    display: flex;
+}
+
+.popup-image {
+    width: 500px;
+    height: 500px;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.popup-close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: #fff;
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.popup-close:hover {
+    background: #ea2828;
+    color: #fff;
+}
+
+.unanswered {
+    background-color: rgba(255, 0, 0, 0.2);
+}
+

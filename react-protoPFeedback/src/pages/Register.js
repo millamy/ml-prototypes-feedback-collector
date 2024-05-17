@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import '../style.css';
 
 function Register() {
@@ -12,10 +12,10 @@ function Register() {
     });
     const [error, setError] = useState('');
 
-    const { username, email, password, confirmPassword } = formData;
+    const {username, email, password, confirmPassword} = formData;
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({...formData, [e.target.name]: e.target.value});
     };
 
     const handleSubmit = async (e) => {
@@ -28,8 +28,8 @@ function Register() {
         try {
             const response = await fetch('/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password }),
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, email, password}),
             });
 
             if (response.ok) {
@@ -46,23 +46,26 @@ function Register() {
     return (
         <div className="register-container">
             <h2>Register</h2>
-            {error && <p className="error">{error}</p>} {/* Display any error that occurs */}
+            {error && <p className="error">{error}</p>}
             <form onSubmit={handleSubmit}>
                 <label htmlFor="username">Username:</label>
-                <input type="text" id="username" name="username" required value={username} onChange={handleChange} />
+                <input type="text" id="username" name="username" required value={username} onChange={handleChange}/>
                 <br/>
                 <label htmlFor="email">Email:</label>
-                <input type="email" id="email" name="email" required value={email} onChange={handleChange} />
+                <input type="email" id="email" name="email" required value={email} onChange={handleChange}/>
                 <br/>
                 <label htmlFor="password">Password:</label>
-                <input type="password" id="password" name="password" required value={password} onChange={handleChange} />
+                <input type="password" id="password" name="password" required value={password} onChange={handleChange}/>
                 <br/>
                 <label htmlFor="confirmPassword">Confirm Password:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required value={confirmPassword} onChange={handleChange} />
+                <input type="password" id="confirmPassword" name="confirmPassword" required value={confirmPassword}
+                       onChange={handleChange}/>
                 <br/>
-                <button type="submit">Register</button>
+                <div className="button-container">
+                    <button id="register-button" type="submit">Register</button>
+                </div>
             </form>
-            <p>Already have an account? <a href="/src/pages/Login">Login</a></p>
+            <p id="login-text">Already have an account? <a href="/login">Login</a></p>
         </div>
     );
 }

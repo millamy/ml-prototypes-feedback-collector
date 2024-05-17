@@ -20,7 +20,7 @@ function Login() {
                 method: 'post',
                 url: '/login',
                 data: formData,
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: {'Content-Type': 'multipart/form-data'},
             });
             if (response.status === 200) {
                 setError('')
@@ -62,11 +62,16 @@ function Login() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <br/>
-                <button type="submit">Login</button>
+                <div className="button-container">
+                    <button type="submit">Login</button>
+                </div>
             </form>
-            {error && <div className="error">{error}</div>}
+            {
+                error && <div className="error">{error}</div>
+            }
         </div>
-    );
+    )
+        ;
 }
 
 export default Login;

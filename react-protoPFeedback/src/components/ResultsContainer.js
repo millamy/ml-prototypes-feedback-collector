@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import Results from '../pages/Results';
 
 function ResultsContainer() {
@@ -28,7 +28,6 @@ function ResultsContainer() {
             });
 
     }, []);
-
 
 
     if (isLoading) {
