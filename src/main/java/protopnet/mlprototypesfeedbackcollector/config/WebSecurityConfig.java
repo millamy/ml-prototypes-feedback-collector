@@ -30,6 +30,7 @@ public class WebSecurityConfig {
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/fonts/**",
                                                                 "/webjars/**")
                                                 .permitAll()
+                                                .requestMatchers("/Various-Birds-Clipart.jpg").permitAll()
                                                 .requestMatchers("/").permitAll()
                                                 .requestMatchers("/register/**").permitAll()
                                                 .requestMatchers("/").permitAll()
