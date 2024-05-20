@@ -240,16 +240,14 @@
                 feedbackData['prototypeImagePath'] = imgdir + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-" + pathIndex
                     + "_activated_prototype_self_act.png";
 
+                // Capture canvas image data
+                var originalCanvas = document.getElementsByClassName("originalImagePath")[index - 1];
+                var prototypeCanvas = document.getElementsByClassName("prototypeImagePath")[index - 1];
+
                 feedbackData['correctness'] = selectedValue.value;
 
-                if (croppers[index - 1]) {
-                    const selectionData = croppers[index - 1].getData();
-                    console.log(`Selection Data for image ${index}:`, selectionData);
-                    feedbackData['selectionX'] = selectionData.x;
-                    feedbackData['selectionY'] = selectionData.y;
-                    feedbackData['selectionWidth'] = selectionData.width;
-                    feedbackData['selectionHeight'] = selectionData.height;
-                }
+                feedbackData['originalImageData'] = originalCanvas.toDataURL();
+                feedbackData['prototypeImageData'] = prototypeCanvas.toDataURL();
 
                 feedbackDataArray.push(feedbackData);
             }
@@ -279,7 +277,6 @@
                         console.log('Received the following instead of valid JSON:', bodyText);
                     });
             });
-
     }
 
     function saveFeedbackAndRedirect() {

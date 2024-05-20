@@ -205,16 +205,16 @@ body {
     background-color: #45a049;
 }
 
-.register-container p {
+.register-container p, .login-container p {
     color: #555555;
 }
 
-.register-container a {
+.register-container a, .login-container a {
     color: #4CAF50;
     text-decoration: none;
 }
 
-.register-container a:hover {
+.register-container a:hover, .login-container a:hover {
     text-decoration: underline;
 }
 
@@ -233,7 +233,7 @@ body {
 }
 
 
-.register-container .button-container {
+.register-container .button-container, .login-container .button-container {
     text-align: center;
 }
 
@@ -494,7 +494,6 @@ select:focus {
     justify-content: center;
     align-items: center;
     flex-direction: row;
-    padding-top: 300px;
 }
 
 .analysis-box {
@@ -727,6 +726,13 @@ select:focus {
 }
 
 /*History*/
+#results-container-history {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    padding-top: 300px;
+}
 .analysis-box button {
     background-color: #4CAF50;
     color: white;

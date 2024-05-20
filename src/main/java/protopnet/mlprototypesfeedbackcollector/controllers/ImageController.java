@@ -186,7 +186,7 @@ public class ImageController {
     } else {
         session.removeAttribute("currentImageIndex");
         session.removeAttribute("selectedImageUrls");
-        return "redirect:/picture-selection";
+        return "redirect:/history";
     }
 
         return "Results";

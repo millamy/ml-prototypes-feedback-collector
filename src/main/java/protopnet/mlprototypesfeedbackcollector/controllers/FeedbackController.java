@@ -13,6 +13,7 @@ import protopnet.mlprototypesfeedbackcollector.model.FeedbackData;
 import protopnet.mlprototypesfeedbackcollector.service.FeedbackService;
 import protopnet.mlprototypesfeedbackcollector.util.ImageUtil;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,13 +39,15 @@ public class FeedbackController {
             LocalDateTime dateTime = LocalDateTime.now();
             for (FeedbackData feedback : feedbackList) {
                 feedback.setUsername(currentUserName());
-                feedback.setOriginalImage(ImageUtil.convertImageToBinary(STATIC_IMAGES_PATH + feedback.getOriginalImagePath()));
-                feedback.setPrototypeImage(ImageUtil.convertImageToBinary(STATIC_IMAGES_PATH + feedback.getPrototypeImagePath()));
+
+                // Convert base64 data to Binary
+                feedback.setOriginalImage(new Binary(decodeBase64Image(feedback.getOriginalImageData())));
+                feedback.setPrototypeImage(new Binary(decodeBase64Image(feedback.getPrototypeImageData())));
+
                 feedback.setLocalDate(dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                 feedback.setLocalTime(dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
                 feedbackService.saveFeedback(feedback);
             }
-
 
             // Return success
             Map<String, Object> response = new HashMap<>();
@@ -59,6 +62,15 @@ public class FeedbackController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    private byte[] decodeBase64Image(String base64ImageData) {
+        // Remove the "data:image/png;base64," prefix if it exists
+        if (base64ImageData.contains(",")) {
+            base64ImageData = base64ImageData.split(",")[1];
+        }
+        return Base64.getDecoder().decode(base64ImageData);
+    }
+
     @RequestMapping(value = "/username", method = RequestMethod.GET)
     @ResponseBody
     public String currentUserName() {

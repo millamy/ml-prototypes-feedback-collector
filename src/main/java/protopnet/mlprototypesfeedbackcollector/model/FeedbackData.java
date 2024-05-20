@@ -22,15 +22,10 @@ public class FeedbackData {
     private String originalImagePath;
     private String prototypeImagePath;
     private String correctness;
-    private Integer selectionX;
-    private Integer selectionY;
-    private Integer selectionWidth;
-    private Integer selectionHeight;
-
-
-
     private String localDate;
     private String localTime;
+    private String originalImageData;
+    private String prototypeImageData;
 
     public FeedbackData(String id, String imageClass, String predictedImageClass,String originalImagePath,  String prototypeImagePath, String correctness) {
         this.id = id;
@@ -39,7 +34,6 @@ public class FeedbackData {
         this.originalImagePath = originalImagePath;
         this.prototypeImagePath = prototypeImagePath;
         this.correctness = correctness;
-
         this.localDate = "0000-00-00";
         this.localTime = "00:00:00";
     }
