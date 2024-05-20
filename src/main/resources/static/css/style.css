@@ -400,11 +400,9 @@ select {
     border-radius: 4px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
 }
 
 .originalImagePath:hover, .prototypeImagePath:hover {
-    transform: scale(1.1);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
@@ -444,6 +442,7 @@ select:focus {
     margin-bottom: 30px;
     width: 100%;
 }
+
 .header nav {
     display: flex;
     justify-content: space-between;
@@ -540,6 +539,7 @@ select:focus {
 .title {
     font-size: 20px;
 }
+
 .image-info {
     font-size: 18px;
 }
@@ -597,7 +597,7 @@ select:focus {
     background-color: #d1e7dd;
 }
 
-.results-table tr.unanswered {
+.results-table tr.red-frame {
     background-color: #e7d1d1;
 }
 
@@ -725,4 +725,176 @@ select:focus {
 #leftButton:hover {
     background-color: #45a049;
     transform: scale(1.08);
+}
+
+/*History*/
+.analysis-box button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px 0;
+}
+
+.analysis-box button:hover {
+    background-color: #45a049;
+}
+
+.analysis-box button:active {
+    background-color: #3e8e41;
+}
+
+/* Styles for filter input fields */
+.filters .filter-input {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.filters .filter-input input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+    font-size: 18px;
+}
+
+.filters .filter-input input:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+.filters {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    font-size: 18px;
+}
+
+th {
+    cursor: pointer;
+}
+
+.sort-menu label {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.sorting-criteria-list {
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.arrow-up {
+    display: none;
+}
+
+.arrow-down.active {
+    display: inline-block;
+}
+
+.arrow-up.active {
+    display: inline-block;
+}
+
+.arrow-down {
+    display: none;
+}
+
+.filter-input-info {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+#analysis-history {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
+    width: 300px;
+}
+
+#analysis-history-buttons {
+    font-size: 18px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px
+}
+
+#analysis-history-buttons .button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px 0;
+}
+
+#white-results-box .button {
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px 10px;
+    gap: 10px;
+}
+
+#white-results-box button:hover {
+    background-color: #45a049;
+}
+
+#white-results-box button:active {
+    background-color: #3e8e41;
+}
+
+/* Styles for sorting criteria list items */
+.sorting-criteria-list-item {
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sorting-criteria-list-item:hover {
+    background-color: #d5d5d5;
+}
+
+.sorting-criteria-list-item .remove-btn {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 5px;
+}
+
+.sorting-criteria-list-item .remove-btn:hover {
+    background-color: #ff1a1a;
 }

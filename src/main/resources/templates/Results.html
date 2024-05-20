@@ -112,13 +112,15 @@
     }
 
     function addCorrectnessListeners() {
-
         var correctnessRadioButtons = document.querySelectorAll('input[name^="correctness_"]');
 
         correctnessRadioButtons.forEach(function (radio) {
             radio.addEventListener('change', function () {
                 var index = parseInt(this.name.replace('correctness_', '')) - 1;
                 toggleSelectAreaButton(index);
+
+                var radioGroup = this.parentElement.parentElement.parentElement.parentElement;
+                radioGroup.classList.remove('red-frame');
             });
         });
     }
@@ -285,7 +287,7 @@
 
         // Loop through each set of radio buttons to check if any option is selected
         for (var index = 1; index <= 10; index++) {
-            var radioGroup = document.querySelector('input[name="correctness_' + index + '"]').parentElement.parentElement;
+            var radioGroup = document.querySelector('input[name="correctness_' + index + '"]').parentElement.parentElement.parentElement.parentElement;
             var selectedValue = document.querySelector('input[name="correctness_' + index + '"]:checked');
 
             // Remove any existing red frame class
@@ -358,6 +360,12 @@
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mousedown', clearCanvas);
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        addCorrectnessListeners();
+        loadImagesToCanvas();
+        setupSelectAreaListeners();
+    });
 
 </script>
 

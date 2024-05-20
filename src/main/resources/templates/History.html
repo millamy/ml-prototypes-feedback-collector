@@ -4,57 +4,14 @@
     <meta charset="UTF-8"/>
     <title>History</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <style>
-        th {
-            cursor: pointer;
-        }
-        .sort-menu {
-            margin-bottom: 10px;
-        }
-        .sort-menu label {
-            margin-right: 10px;
-        }
-        .sorting-criteria-list {
-            margin-bottom: 10px;
-        }
-        .sorting-criteria-list-item {
-            display: inline-block;
-            margin-right: 5px;
-            padding: 2px 5px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .arrow-up {
-            display: none;
-        }
-        .arrow-down.active {
-            display: inline-block;
-        }
-        .arrow-up.active {
-            display: inline-block;
-        }
-        .arrow-down {
-            display: none;
-        }
-        .filter-input {
-            margin-bottom: 5px;
-        }
-        .filter-input-info {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-    </style>
 </head>
 <body>
 <div class="header">
     <nav>
         <ul>
+            <div class="white-box-header"><a href="/home">Home</a></div>
             <div class="white-box-header"><a href="/about-us">About Us</a></div>
             <div class="white-box-header"><a href="/picture-selection">Bird Selection</a></div>
-            <div class="white-box-header"><a href="/history">History</a></div>
             <div class="white-box-header sign-out"><a href="/logout">Sign Out</a></div>
         </ul>
     </nav>
@@ -62,18 +19,22 @@
 
 <h1>History</h1>
 
-<div class="white-box">
+<div class="results-container">
     <!-- Sorting Menu -->
-    <div class="sort-menu">
-        <label>Sort by:</label>
-        <select id="sortSelect">
-        </select>
-        <button onclick="addSortingCriteria()">Add Sorting Criteria</button>
-        <button onclick="sortTable()">Sort</button>
-        <button id="toggleDirectionButton" onclick="toggleSortDirection()">
-            <span class="arrow-up active" id="arrowUp">&#x25B2;</span>
-            <span class="arrow-down" id="arrowDown">&#x25BC;</span>
-        </button>
+    <div class="left-container">
+        <div id="analysis-history" class="analysis-box">
+            <label>Sort by:</label>
+            <select id="sortSelect">
+            </select>
+            <div id="analysis-history-buttons">
+                <button class="action-button" onclick="addSortingCriteria()">Add Sorting Criteria</button>
+                <button class="action-button" onclick="sortTable()">Sort</button>
+                <button class="action-button" id="toggleDirectionButton" onclick="toggleSortDirection()">
+                    <span class="arrow-up active" id="arrowUp">&#x25B2;</span>
+                    <span class="arrow-down" id="arrowDown">&#x25BC;</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Sorting Criteria List -->
@@ -87,35 +48,39 @@
     </div>
 </div>
 
-<div class="white-box">
-    <button onclick="exportTableToCSV()">Export to CSV</button>
-    <div class="scrollable-table">
-        <table id="feedbackTable" border="1">
-            <thead>
-            <tr>
-                <th>Username</th>
-                <th>Image Class</th>
-                <th>Predicted Image Class</th>
-                <th>Correctness</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Original Image</th>
-                <th>Prototype Image</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="feedback : ${feedbacks}">
-                <td th:text="${feedback.username}"></td>
-                <td th:text="${feedback.imageClass}"></td>
-                <td th:text="${feedback.predictedImageClass}"></td>
-                <td th:text="${feedback.correctness}"></td>
-                <td th:text="${feedback.localDate}"></td>
-                <td th:text="${feedback.localTime}"></td>
-                <td><img th:src="${feedback.originalImagePath}" width="100" height="100" alt="Original Image"></td>
-                <td><img th:src="${feedback.prototypeImagePath}" width="100" height="100" alt="Prototype Image"></td>
-            </tr>
-            </tbody>
-        </table>
+<div class="center-container">
+    <div id="white-results-box" class="white-box">
+        <button onclick="exportTableToCSV()">Export to CSV</button>
+        <div class="scrollable-table">
+            <table id="feedbackTable" class="results-table" border="1">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Image Class</th>
+                    <th>Predicted Image Class</th>
+                    <th>Correctness</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Original Image</th>
+                    <th>Prototype Image</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="feedback : ${feedbacks}">
+                    <td th:text="${feedback.username}"></td>
+                    <td th:text="${feedback.imageClass}"></td>
+                    <td th:text="${feedback.predictedImageClass}"></td>
+                    <td th:text="${feedback.correctness}"></td>
+                    <td th:text="${feedback.localDate}"></td>
+                    <td th:text="${feedback.localTime}"></td>
+                    <td><img th:src="${feedback.originalImagePath}" width="100" height="100" alt="Original Image">
+                    </td>
+                    <td><img th:src="${feedback.prototypeImagePath}" width="100" height="100" alt="Prototype Image">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -126,7 +91,7 @@
 
     // Initialize sorting options
     var sortSelect = document.getElementById("sortSelect");
-    columns.forEach(function(column, index) {
+    columns.forEach(function (column, index) {
         var optionElement = document.createElement("option");
         optionElement.value = index;
         optionElement.text = column;
@@ -152,19 +117,21 @@
             var criteriaName = columns[criteria];
             var criteriaItem = document.createElement("div");
             criteriaItem.classList.add("sorting-criteria-list-item");
-            criteriaItem.textContent = criteriaName;
-            criteriaItem.setAttribute("onclick", "removeSortingCriteria(" + criteria + ")");
+
+            var criteriaText = document.createElement("span");
+            criteriaText.textContent = criteriaName;
+
+            var removeBtn = document.createElement("button");
+            removeBtn.classList.add("remove-btn");
+            removeBtn.textContent = "×";
+            removeBtn.setAttribute("onclick", "removeSortingCriteria(" + criteria + ")");
+
+            criteriaItem.appendChild(criteriaText);
+            criteriaItem.appendChild(removeBtn);
             sortingCriteriaList.appendChild(criteriaItem);
         });
     }
 
-    function removeSortingCriteria(columnIndex) {
-        var index = sortingCriteria.indexOf(columnIndex);
-        if (index !== -1) {
-            sortingCriteria.splice(index, 1);
-            updateSortingCriteriaList();
-        }
-    }
 
     function sortTable() {
         var table = document.getElementById("feedbackTable");
@@ -222,13 +189,15 @@
 
     // Generate filtering inputs dynamically
     var filterSection = document.querySelector(".filters");
-    columns.forEach(function(column, index) {
+    columns.forEach(function (column, index) {
         var filterInput = document.createElement("div");
         filterInput.classList.add("filter-input");
         var input = document.createElement("input");
         input.type = "text";
         input.id = column.replace(/\s+/g, '') + "Filter"; // Remove spaces from column name for id
-        input.onkeyup = function() { filterTable(index); };
+        input.onkeyup = function () {
+            filterTable(index);
+        };
         input.placeholder = "Filter by " + column;
         filterInput.appendChild(input);
         filterSection.appendChild(filterInput);
@@ -271,7 +240,7 @@
         var filteredRows = Array.from(rows).sort(compareRows);
 
         // Loop through each row and collect cell data
-        filteredRows.forEach(function(row) {
+        filteredRows.forEach(function (row) {
             if (row.style.display !== "none") {
                 var rowData = [];
                 row.querySelectorAll("td").forEach(function (cell) {
@@ -285,7 +254,7 @@
         var csvString = csv.join("\n");
 
         // Create a Blob object to save the CSV data
-        var blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+        var blob = new Blob([csvString], {type: "text/csv;charset=utf-8;"});
 
         // Create a temporary link element to trigger the download
         var link = document.createElement("a");
@@ -298,31 +267,31 @@
         document.body.removeChild(link);
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         var canvas = document.getElementById('imageCanvas');
         var ctx = canvas.getContext('2d');
         var points = [];
         var isDrawing = false;
 
-        canvas.addEventListener('mousedown', function(e) {
+        canvas.addEventListener('mousedown', function (e) {
             var rect = canvas.getBoundingClientRect();
             var x = e.clientX - rect.left;
             var y = e.clientY - rect.top;
             isDrawing = true;
-            points.push({ x: x, y: y });
+            points.push({x: x, y: y});
             drawPoints();
         });
 
-        canvas.addEventListener('mousemove', function(e) {
+        canvas.addEventListener('mousemove', function (e) {
             if (!isDrawing) return;
             var rect = canvas.getBoundingClientRect();
             var x = e.clientX - rect.left;
             var y = e.clientY - rect.top;
-            points.push({ x: x, y: y });
+            points.push({x: x, y: y});
             drawPoints();
         });
 
-        canvas.addEventListener('mouseup', function() {
+        canvas.addEventListener('mouseup', function () {
             isDrawing = false;
             // Optionally close the path automatically
             if (points.length > 1) {
@@ -331,7 +300,7 @@
             }
         });
 
-        canvas.addEventListener('mouseleave', function() {
+        canvas.addEventListener('mouseleave', function () {
             isDrawing = false;
         });
 
@@ -346,10 +315,28 @@
             ctx.stroke();
         }
 
-        window.clearCanvas = function() {
+        window.clearCanvas = function () {
             points = [];
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
+    });
+
+    function replaceCorrectnessValues() {
+        var table = document.getElementById("feedbackTable");
+        var rows = table.getElementsByTagName("tr");
+
+        for (var i = 1; i < rows.length; i++) {
+            var cells = rows[i].getElementsByTagName("td");
+            var correctnessCell = cells[3];
+
+            if (correctnessCell.textContent.trim().toLowerCase() === "idk") {
+                correctnessCell.textContent = "i don't know";
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        replaceCorrectnessValues();
     });
 
 
