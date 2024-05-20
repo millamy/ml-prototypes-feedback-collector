@@ -226,7 +226,7 @@
                 var feedbackData = {};
                 feedbackData['imageClass'] = document.getElementById("originalImageClass").innerText;
                 feedbackData['predictedImageClass'] = document.getElementById("predictedImageClass").innerText;
-                var thSrc = document.getElementsByClassName("originalImagePath")[index - 1].getAttribute("src");
+                var thSrc = document.getElementsByClassName("originalImagePath")[index - 1].getAttribute("data-src");
 
                 let parts = thSrc.split("/");
 

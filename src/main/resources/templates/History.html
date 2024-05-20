@@ -232,6 +232,15 @@
         }
     }
 
+    function removeSortingCriteria(columnIndex) {
+        var index = sortingCriteria.indexOf(columnIndex);
+        if (index !== -1) {
+            sortingCriteria.splice(index, 1);
+            updateSortingCriteriaList();
+        }
+    }
+
+
     function exportTableToCSV() {
         var csv = [];
         var rows = document.querySelectorAll("#feedbackTable tbody tr");

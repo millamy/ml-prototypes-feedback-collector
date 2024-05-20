@@ -493,9 +493,8 @@ select:focus {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 50px;
     flex-direction: row;
-    /*margin-right: 100px;*/
+    padding-top: 300px;
 }
 
 .analysis-box {
@@ -818,7 +817,8 @@ th {
     flex-direction: column;
     align-items: center;
     margin-right: 20px;
-    width: 300px;
+    padding: 30px;
+    width: 350px;
 }
 
 #analysis-history-buttons {
@@ -892,7 +892,7 @@ th {
     align-items: center;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-left: 5px;
+    margin-left: 10px;
 }
 
 .sorting-criteria-list-item .remove-btn:hover {
