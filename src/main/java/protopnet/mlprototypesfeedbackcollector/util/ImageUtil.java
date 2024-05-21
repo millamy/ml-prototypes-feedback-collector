@@ -15,10 +15,12 @@ public class ImageUtil {
         return new Binary(imageData);
     }
 
-    // not in use right now but may be usefull in future & for testing
-    public static void convertBinaryToImage(Binary binary, String outputPath) throws IOException {
-        byte[] imageData = binary.getData();
-        Files.write(Paths.get(outputPath), imageData);
+    public static Binary convertBase64ToBinary(String base64Data) {
+        if (base64Data.contains(",")) {
+            base64Data = base64Data.split(",")[1];
+        }
+        byte[] imageData = Base64.getDecoder().decode(base64Data);
+        return new Binary(imageData);
     }
 
     public static String convertBinaryToImageDataUri(Binary binaryData) {
