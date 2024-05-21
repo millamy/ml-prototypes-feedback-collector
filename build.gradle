@@ -30,8 +30,21 @@ dependencies {
 		exclude group: 'org.mongodb', module: 'mongodb-driver-core'
 	}
 	implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
+	testImplementation 'org.mockito:mockito-core'
+	testImplementation 'org.mockito:mockito-junit-jupiter'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "PASSED", "FAILED", "SKIPPED"
+	}
+	reports {
+		junitXml.required.set(true)
+		html.required.set(true)
+	}
 }
