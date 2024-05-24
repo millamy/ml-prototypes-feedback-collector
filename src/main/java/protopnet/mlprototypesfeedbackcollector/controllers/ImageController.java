@@ -1,21 +1,6 @@
 package protopnet.mlprototypesfeedbackcollector.controllers;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.Comparator; 
-
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,18 +8,25 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpSession;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
+/**
+ * Controller class for handling image-related requests.
+ */
 @Controller
 public class ImageController {
 
-// Set and change in application.properties
+    // Set and change in application.properties
     @Value("${local_analysis.static.path}")
     private String LOCAL_ANALYSIS_PATH;
 
@@ -47,6 +39,13 @@ public class ImageController {
     @Value("${images_direct.static.path}")
     private String STATIC_IMAGES_PATH;
 
+    /**
+     * Endpoint for displaying the bird picture selection page.
+     *
+     * @param model   the model to be used for adding attributes.
+     * @param session the HTTP session to store attributes.
+     * @return the name of the Thymeleaf/JSP template for the picture selection page.
+     */
     @GetMapping("/picture-selection")
     public String showBirdSelection(Model model, HttpSession session) {
         File birdPictureFolder = new File(STATIC_IMAGES_PATH);
@@ -72,7 +71,7 @@ public class ImageController {
                         })
                         .sorted()
                         .collect(Collectors.toList());
-                        
+
 
                 model.addAttribute("birdNames", processedBirdNames);
                 model.addAttribute("nameToFolderMap", birdToFolder);
@@ -85,22 +84,34 @@ public class ImageController {
         return "PictureSelection";
     }
 
+    /**
+     * Processes an array of bird names by removing the prefix and replacing underscores with spaces.
+     *
+     * @param birdNames an array of bird names in the format "###_bird_name".
+     * @return a list of processed bird names with prefixes removed and underscores replaced by spaces.
+     */
     private List<String> getBirdProcessedNames(String[] birdNames) {
         return Arrays.stream(birdNames)
-                        .map(name -> {
-                            String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
-                            return processedName;
-                        })
-                        .collect(Collectors.toList());
+                .map(name -> {
+                    String processedName = name.substring(name.indexOf('.') + 1).replace('_', ' ');
+                    return processedName;
+                })
+                .collect(Collectors.toList());
     }
 
-
-    //Connecting with model
+    /**
+     * Endpoint for analyzing selected pictures.
+     *
+     * @param selectedImageUrl the URL of the selected image.
+     * @param birdKind         the kind of bird.
+     * @param model            the model to be used for adding attributes.
+     * @param session          the HTTP session to store attributes.
+     * @return the name of the Thymeleaf/JSP template for the results page.
+     */
     @PostMapping("/selected-pictures")
     public String analyzeSelectedPictures(@RequestParam String selectedImageUrl, @RequestParam String birdKind,
-            Model model, HttpSession session) {
+                                          Model model, HttpSession session) {
         String[] imageUrls = selectedImageUrl.split(";");
-
 
         Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
         if (currentImageIndex == null) {
@@ -118,27 +129,27 @@ public class ImageController {
 
             // System.out.println("imgclassStr: " + imgclassStr + "\norignalImgclass: " + originalImgclass
             //         + "\nimgclass: " + imgclass + "\nimgdir: " + imgdir + "\nimg: " + img + "\n\n");
-           
-             String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH +
+
+            String analysisCommand = "python " + LOCAL_ANALYSIS_PATH + " -modeldir " + MODELDIR_PATH +
                     " -model " + MODEL_PATH + " -imgdir " + STATIC_IMAGES_PATH
                     + imgdir + " -img " + img + " -imgclass " + imgclass;
 
-        ProcessBuilder builder;
+            ProcessBuilder builder;
 
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
-        } else {
-            builder = new ProcessBuilder("python3", LOCAL_ANALYSIS_PATH,
-                    "-modeldir", MODELDIR_PATH,
-                    "-model", MODEL_PATH,
-                    "-imgdir", STATIC_IMAGES_PATH + imgdir,
-                    "-img", img,
-                    "-imgclass", String.valueOf(imgclass));
-        }
+            if (System.getProperty("os.name").startsWith("Windows")) {
+                builder = new ProcessBuilder("cmd.exe", "/c", analysisCommand);
+            } else {
+                builder = new ProcessBuilder("python3", LOCAL_ANALYSIS_PATH,
+                        "-modeldir", MODELDIR_PATH,
+                        "-model", MODEL_PATH,
+                        "-imgdir", STATIC_IMAGES_PATH + imgdir,
+                        "-img", img,
+                        "-imgclass", String.valueOf(imgclass));
+            }
 
-        try {
-            builder.redirectErrorStream(true);
-            Process process = builder.start();
+            try {
+                builder.redirectErrorStream(true);
+                Process process = builder.start();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 StringBuilder output = new StringBuilder();
@@ -163,7 +174,7 @@ public class ImageController {
 
                     // Uncomment to get output to the terminal
                     //System.out.println(output + "\n\n");
-                    String[] birdNames = (String[])session.getAttribute("folderNames");
+                    String[] birdNames = (String[]) session.getAttribute("folderNames");
 
                     model.addAttribute("birdNames", getBirdProcessedNames(birdNames));
                     model.addAttribute("predictedClass", Integer.parseInt(prototypeInfo[1].trim()));
@@ -181,17 +192,24 @@ public class ImageController {
                 model.addAttribute("error", "Error executing the analysis command: " + e.getMessage());
                 return "Results";
             }
-        session.setAttribute("currentImageIndex", currentImageIndex);
-        session.setAttribute("selectedImageUrls", selectedImageUrl);
-    } else {
-        session.removeAttribute("currentImageIndex");
-        session.removeAttribute("selectedImageUrls");
-        return "redirect:/history";
-    }
+            session.setAttribute("currentImageIndex", currentImageIndex);
+            session.setAttribute("selectedImageUrls", selectedImageUrl);
+        } else {
+            session.removeAttribute("currentImageIndex");
+            session.removeAttribute("selectedImageUrls");
+            return "redirect:/history";
+        }
 
         return "Results";
-}
+    }
 
+    /**
+     * Endpoint for analyzing the next image.
+     *
+     * @param session the HTTP session to store attributes.
+     * @param model   the model to be used for adding attributes.
+     * @return the name of the Thymeleaf/JSP template for the results page.
+     */
     @GetMapping("/analyze-next")
     public String analyzeNextImage(HttpSession session, Model model) {
         Integer currentImageIndex = (Integer) session.getAttribute("currentImageIndex");
@@ -205,46 +223,54 @@ public class ImageController {
         }
     }
 
-    //Fetching images
-
+    /**
+     * Endpoint for fetching images from a specified folder.
+     *
+     * @param folderName the name of the folder containing the images.
+     * @return a response entity containing a list of image data maps.
+     */
     @GetMapping("/images/{folderName}")
     @ResponseBody
     public ResponseEntity<List<Map<String, String>>> getBirdImages(@PathVariable String folderName) {
-        
+        List<Map<String, String>> imageDatas = new ArrayList<>();
+        File birdFolder = new File(STATIC_IMAGES_PATH + folderName);
 
-       
-            List<Map<String, String>> imageDatas = new ArrayList<>();
-            File birdFolder = new File(STATIC_IMAGES_PATH + folderName);
+        if (birdFolder.exists() && birdFolder.isDirectory()) {
+            File[] birdImages = birdFolder.listFiles();
+            if (birdImages != null) {
+                for (File file : birdImages) {
+                    if (file.isFile()) {
+                        try {
+                            byte[] imageData = Files.readAllBytes(file.toPath());
+                            String base64Image = Base64.getEncoder().encodeToString(imageData);
 
-            if (birdFolder.exists() && birdFolder.isDirectory()) {
-                File[] birdImages = birdFolder.listFiles();
-                if (birdImages != null) {
-                    for (File file : birdImages) {
-                        if (file.isFile()) {
-                            try {
-                                byte[] imageData = Files.readAllBytes(file.toPath());
-                                String base64Image = Base64.getEncoder().encodeToString(imageData);
 
-                                
-                                Map<String, String> imageDataMap = new HashMap<>();
-                                imageDataMap.put("imageData", base64Image);
-                                imageDataMap.put("folderPath", folderName+"/"+file.getName());
+                            Map<String, String> imageDataMap = new HashMap<>();
+                            imageDataMap.put("imageData", base64Image);
+                            imageDataMap.put("folderPath", folderName + "/" + file.getName());
 
-                                imageDatas.add(imageDataMap);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            imageDatas.add(imageDataMap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
-                return ResponseEntity.ok(imageDatas);
             }
+            return ResponseEntity.ok(imageDatas);
+        }
 
-            
 
         return ResponseEntity.notFound().build();
     }
 
+    /**
+     * Endpoint for retrieving generated images.
+     *
+     * @param imgdir the directory containing the images.
+     * @param index  the index of the image.
+     * @param type   the type of the image.
+     * @return a response entity containing the image data.
+     */
     @GetMapping("/results_images/{imgdir}/{index}/{type}")
     public ResponseEntity<byte[]> getGeneratedImage(
             @PathVariable String imgdir,

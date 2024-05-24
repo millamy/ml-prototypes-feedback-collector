@@ -11,15 +11,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import protopnet.mlprototypesfeedbackcollector.model.FeedbackData;
 import protopnet.mlprototypesfeedbackcollector.service.FeedbackService;
-import protopnet.mlprototypesfeedbackcollector.util.ImageUtil;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
+/**
+ * Controller class for handling feedback-related requests.
+ */
 @Controller
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class FeedbackController {
@@ -28,11 +30,22 @@ public class FeedbackController {
     private String STATIC_IMAGES_PATH;
     private final FeedbackService feedbackService;
 
+    /**
+     * Constructor for FeedbackController.
+     *
+     * @param feedbackService the feedback service to be used by the controller.
+     */
     @Autowired
     public FeedbackController(FeedbackService feedbackService) {
         this.feedbackService = feedbackService;
     }
 
+    /**
+     * Endpoint for saving feedback.
+     *
+     * @param feedbackList a list of feedback data to be saved.
+     * @return a response entity containing a success flag and message.
+     */
     @PutMapping("/save-feedback")
     public ResponseEntity<Map<String, Object>> saveFeedback(@RequestBody List<FeedbackData> feedbackList) {
         try {
@@ -63,6 +76,12 @@ public class FeedbackController {
         }
     }
 
+    /**
+     * Decodes a base64 encoded image string.
+     *
+     * @param base64ImageData the base64 encoded image data.
+     * @return a byte array representing the decoded image.
+     */
     private byte[] decodeBase64Image(String base64ImageData) {
         // Remove the "data:image/png;base64," prefix if it exists
         if (base64ImageData.contains(",")) {
@@ -71,13 +90,18 @@ public class FeedbackController {
         return Base64.getDecoder().decode(base64ImageData);
     }
 
+    /**
+     * Endpoint for retrieving the current username.
+     *
+     * @return the username of the current user.
+     */
     @RequestMapping(value = "/username", method = RequestMethod.GET)
     @ResponseBody
     public String currentUserName() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (principal instanceof UserDetails) {
-            return ((UserDetails)principal).getUsername();
+            return ((UserDetails) principal).getUsername();
         } else {
             return principal.toString();
         }

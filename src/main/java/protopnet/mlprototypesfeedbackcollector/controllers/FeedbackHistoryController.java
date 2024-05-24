@@ -8,19 +8,32 @@ import protopnet.mlprototypesfeedbackcollector.model.FeedbackData;
 import protopnet.mlprototypesfeedbackcollector.service.FeedbackService;
 import protopnet.mlprototypesfeedbackcollector.util.ImageUtil;
 
-import java.util.Base64;
 import java.util.List;
 
+/**
+ * Controller class for handling feedback history-related requests.
+ */
 @Controller
 public class FeedbackHistoryController {
 
     private final FeedbackService feedbackService;
 
+    /**
+     * Constructor for FeedbackHistoryController.
+     *
+     * @param feedbackService the feedback service to be used by the controller.
+     */
     @Autowired
     public FeedbackHistoryController(FeedbackService feedbackService) {
         this.feedbackService = feedbackService;
     }
 
+    /**
+     * Endpoint for retrieving all feedbacks.
+     *
+     * @param model the model to be used for adding attributes.
+     * @return the name of the Thymeleaf/JSP template to display feedbacks.
+     */
     @GetMapping("/history")
     public String getAllFeedbacks(Model model) {
         List<FeedbackData> feedbackList = feedbackService.getAllFeedbacks();
@@ -29,11 +42,11 @@ public class FeedbackHistoryController {
             String originalImageDataUri = ImageUtil.convertBinaryToImageDataUri(feedback.getOriginalImage());
             String prototypeImageDataUri = ImageUtil.convertBinaryToImageDataUri(feedback.getPrototypeImage());
 
-            feedback.setOriginalImagePath(originalImageDataUri); // Ustaw przetworzony obraz jako ścieżkę obrazu
-            feedback.setPrototypeImagePath(prototypeImageDataUri); // Ustaw przetworzony obraz jako ścieżkę obrazu
+            feedback.setOriginalImagePath(originalImageDataUri);
+            feedback.setPrototypeImagePath(prototypeImageDataUri);
         });
 
-        model.addAttribute("feedbacks", feedbackList );
-        return "History"; // Name of the Thymeleaf/JSP template to display feedbacks
+        model.addAttribute("feedbacks", feedbackList);
+        return "History";
     }
 }
