@@ -16,6 +16,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Integration tests for the RegisterController.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class RegisterControllerIntegrationTest {
@@ -26,6 +29,11 @@ public class RegisterControllerIntegrationTest {
     @MockBean
     private UserService userService;
 
+    /**
+     * Test for displaying the registration form.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     public void testShowRegistrationForm() throws Exception {
         mockMvc.perform(get("/register"))
@@ -33,6 +41,11 @@ public class RegisterControllerIntegrationTest {
                 .andExpect(view().name("Register"));
     }
 
+    /**
+     * Test for successful user registration.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     public void testRegisterUser_Success() throws Exception {
         User user = new User();
@@ -50,6 +63,11 @@ public class RegisterControllerIntegrationTest {
                 .andExpect(redirectedUrl("/login?regisrationSuccess"));
     }
 
+    /**
+     * Test for user registration with an already taken username.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     public void testRegisterUser_UsernameTaken() throws Exception {
         User existingUser = new User();

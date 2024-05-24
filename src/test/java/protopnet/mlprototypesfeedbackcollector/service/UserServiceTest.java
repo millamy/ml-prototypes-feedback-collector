@@ -11,6 +11,9 @@ import protopnet.mlprototypesfeedbackcollector.repository.UserRepository;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the UserService.
+ */
 public class UserServiceTest {
 
     @Mock
@@ -26,6 +29,9 @@ public class UserServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Test for successful user registration.
+     */
     @Test
     public void testRegisterUserSuccess() {
         User user = new User();
@@ -44,6 +50,9 @@ public class UserServiceTest {
         verify(userRepository, times(1)).save(user);
     }
 
+    /**
+     * Test for user registration when the username is already taken.
+     */
     @Test
     public void testRegisterUserUsernameTaken() {
         User user = new User();
@@ -57,6 +66,9 @@ public class UserServiceTest {
         verify(userRepository, times(0)).save(user);
     }
 
+    /**
+     * Test for finding a user by username.
+     */
     @Test
     public void testFindByUsername() {
         User user = new User();

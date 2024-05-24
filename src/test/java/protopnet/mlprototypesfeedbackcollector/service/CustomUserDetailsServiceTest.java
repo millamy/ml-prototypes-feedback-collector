@@ -12,6 +12,9 @@ import protopnet.mlprototypesfeedbackcollector.repository.UserRepository;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the CustomUserDetailsService.
+ */
 public class CustomUserDetailsServiceTest {
 
     @Mock
@@ -24,6 +27,9 @@ public class CustomUserDetailsServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Test for successfully loading a user by username.
+     */
     @Test
     public void testLoadUserByUsernameSuccess() {
         User user = new User();
@@ -40,6 +46,9 @@ public class CustomUserDetailsServiceTest {
         verify(userRepository, times(1)).findByUsername("testuser");
     }
 
+    /**
+     * Test for loading a user by username when the user is not found.
+     */
     @Test
     public void testLoadUserByUsernameNotFound() {
         when(userRepository.findByUsername("nonexistentuser")).thenReturn(null);

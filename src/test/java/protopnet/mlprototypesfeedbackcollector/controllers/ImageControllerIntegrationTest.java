@@ -16,6 +16,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+/**
+ * Integration tests for the ImageController.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ImageControllerIntegrationTest {
@@ -35,6 +38,11 @@ public class ImageControllerIntegrationTest {
     @Value("${images_direct.static.path}")
     private String STATIC_IMAGES_PATH;
 
+    /**
+     * Test for displaying the bird selection page.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser
     public void testShowBirdSelection() throws Exception {
@@ -48,6 +56,11 @@ public class ImageControllerIntegrationTest {
                 .andExpect(view().name("PictureSelection"));
     }
 
+    /**
+     * Test for analyzing selected pictures successfully.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser
     public void testAnalyzeSelectedPictures_Success() throws Exception {
@@ -63,7 +76,11 @@ public class ImageControllerIntegrationTest {
                 .andExpect(view().name("Results"));
     }
 
-
+    /**
+     * Test for analyzing the next image.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser
     public void testAnalyzeNextImage() throws Exception {

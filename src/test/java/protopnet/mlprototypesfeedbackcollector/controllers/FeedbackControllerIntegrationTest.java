@@ -20,6 +20,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * Integration tests for the FeedbackController.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class FeedbackControllerIntegrationTest {
@@ -30,6 +33,11 @@ public class FeedbackControllerIntegrationTest {
     @MockBean
     private FeedbackService feedbackService;
 
+    /**
+     * Test for successful feedback saving.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser(username = "testuser")
     public void testSaveFeedback_Success() throws Exception {
@@ -47,6 +55,11 @@ public class FeedbackControllerIntegrationTest {
                 .andExpect(jsonPath("$.success").value(true));
     }
 
+    /**
+     * Test for error during feedback saving.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser(username = "testuser")
     public void testSaveFeedback_Error() throws Exception {
@@ -60,6 +73,11 @@ public class FeedbackControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Error occurred while saving feedback data."));
     }
 
+    /**
+     * Test for retrieving the current username.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser(username = "testuser")
     public void testCurrentUserName() throws Exception {

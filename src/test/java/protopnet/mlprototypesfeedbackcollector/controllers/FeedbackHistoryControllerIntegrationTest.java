@@ -17,6 +17,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Integration tests for the FeedbackHistoryController.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class FeedbackHistoryControllerIntegrationTest {
@@ -27,6 +30,11 @@ public class FeedbackHistoryControllerIntegrationTest {
     @MockBean
     private FeedbackService feedbackService;
 
+    /**
+     * Test for retrieving all feedbacks.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser
     public void testGetAllFeedbacks() throws Exception {

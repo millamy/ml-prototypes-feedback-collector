@@ -11,6 +11,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+/**
+ * Integration tests for the LoginController.
+ */
+
 @SpringBootTest
 @AutoConfigureMockMvc
 public class LoginControllerIntegrationTest {
@@ -18,6 +22,11 @@ public class LoginControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    /**
+     * Test for displaying the login form.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser
     public void testLoginForm() throws Exception {

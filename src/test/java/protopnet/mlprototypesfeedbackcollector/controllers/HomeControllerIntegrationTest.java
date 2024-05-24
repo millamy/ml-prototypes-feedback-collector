@@ -11,6 +11,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+/**
+ * Integration tests for the HomeController.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class HomeControllerIntegrationTest {
@@ -18,6 +21,11 @@ public class HomeControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
+    /**
+     * Test for displaying the home page.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser
     public void testShowHomePage() throws Exception {
@@ -26,6 +34,11 @@ public class HomeControllerIntegrationTest {
                 .andExpect(view().name("HomePage"));
     }
 
+    /**
+     * Test for displaying the home page for registered users.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser
     public void testShowHomePageForRegisteredUser() throws Exception {
@@ -34,6 +47,11 @@ public class HomeControllerIntegrationTest {
                 .andExpect(view().name("HomePageForRegisteredUser"));
     }
 
+    /**
+     * Test for displaying the About Us page.
+     *
+     * @throws Exception if an error occurs during the request.
+     */
     @Test
     @WithMockUser
     public void testShowAboutUs() throws Exception {

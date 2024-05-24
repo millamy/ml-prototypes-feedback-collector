@@ -15,6 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the FeedbackService.
+ */
 public class FeedbackServiceTest {
 
     @Mock
@@ -27,6 +30,9 @@ public class FeedbackServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Test for saving feedback.
+     */
     @Test
     public void testSaveFeedback() {
         FeedbackData feedback = new FeedbackData();
@@ -39,6 +45,9 @@ public class FeedbackServiceTest {
         verify(feedbackRepository, times(1)).save(feedback);
     }
 
+    /**
+     * Test for deleting feedback.
+     */
     @Test
     public void testDeleteFeedback() {
         String feedbackId = "testId";
@@ -50,6 +59,9 @@ public class FeedbackServiceTest {
         verify(feedbackRepository, times(1)).deleteById(feedbackId);
     }
 
+    /**
+     * Test for retrieving feedback by ID.
+     */
     @Test
     public void testGetFeedback() {
         String feedbackId = "testId";
@@ -63,6 +75,9 @@ public class FeedbackServiceTest {
         verify(feedbackRepository, times(1)).findById(feedbackId);
     }
 
+    /**
+     * Test for retrieving all feedbacks.
+     */
     @Test
     public void testGetAllFeedbacks() {
         FeedbackData feedback = new FeedbackData();
