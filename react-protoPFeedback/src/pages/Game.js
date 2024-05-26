@@ -37,16 +37,13 @@ const Game = () => {
             const response = await axios.get('/api/bird-names');
             const birdNames = response.data;
 
-            // Log response to check the format of birdNames
-            console.log('Bird names response:', birdNames);
-
-            // Ensure birdNames is an array
             if (Array.isArray(birdNames)) {
                 const incorrectOptions = birdNames.filter(name => !name.includes(correctBirdName))
                     .sort(() => 0.5 - Math.random())
-                    .slice(0, 3);
+                    .slice(0, 3)
+                    .map(name => cleanBirdName(name));
 
-                const allOptions = [...incorrectOptions, correctBirdName].sort(() => 0.5 - Math.random());
+                const allOptions = [...incorrectOptions, cleanBirdName(correctBirdName) + ' +'].sort(() => 0.5 - Math.random());
                 setOptions(allOptions);
             } else {
                 console.error('Bird names is not an array:', birdNames);
@@ -58,8 +55,12 @@ const Game = () => {
         }
     };
 
+    const cleanBirdName = (name) => {
+        return name.replace(/^\d{3}\./, '').replace(/_/g, ' ');
+    };
+
     const handleOptionClick = async (option) => {
-        if (option === bird.imageName) {
+        if (option === cleanBirdName(bird.imageName) + ' +') {
             setScore(score + 1);
             setShowScoreIncrement(true);
             setTimeout(() => setShowScoreIncrement(false), 1000);
@@ -74,14 +75,14 @@ const Game = () => {
                 }
             });
         } else {
-            setCorrectAnswer(bird.imageName);
+            setCorrectAnswer(cleanBirdName(bird.imageName) + ' +');
             await controls.start({
                 x: [0, -10, 10, -10, 10, 0],
                 transition: {duration: 0.4},
             });
             await Swal.fire({
                 title: 'Wrong!',
-                html: `The correct answer is: <b>${bird.imageName}</b>`,
+                html: `The correct answer is: <b>${cleanBirdName(bird.imageName)} +</b>`,
                 icon: 'error',
                 popup: 'error-popup',
                 didClose: () => {
@@ -104,7 +105,7 @@ const Game = () => {
                 </nav>
             </div>
             <div className="game-container">
-            <motion.h1
+                <motion.h1
                     initial={{y: -100}}
                     animate={{y: 0}}
                     transition={{duration: 0.5}}

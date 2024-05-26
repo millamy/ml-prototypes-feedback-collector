@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../style.css';
@@ -85,7 +85,7 @@ function BirdSelection() {
                 setIsLoading(false);
                 navigate('/results');
             })
-            .catch(error =>  {
+            .catch(error => {
                 console.error('Error:', error)
                 setIsLoading(false);
             });
@@ -131,6 +131,10 @@ function BirdSelection() {
                                     alt="Bird Image"
                                     className={`image-item ${selectedImages.includes(record.folderPath) ? 'selected' : ''}`}
                                     onClick={() => handleImageClick(record.folderPath)}
+                                    onError={(e) => {
+                                        e.target.onerror = null; // prevents looping
+                                        e.target.style.display = 'none';
+                                    }}
                                 />
                             ))}
                         </div>
