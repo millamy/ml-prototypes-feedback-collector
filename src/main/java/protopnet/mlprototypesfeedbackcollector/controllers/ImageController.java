@@ -162,11 +162,17 @@ public class ImageController {
 
                 if (exitCode == 0) {
                     String[] resultsLines = output.toString().split("\\n");
-                    String predictedClass = resultsLines[8].substring(resultsLines[8].indexOf(":") + 1).trim();
+
+                    String prototypeInfoLine;
+                    if (Files.exists(Paths.get("/usr/src/app/RUNNING_IN_DOCKER"))) {
+                        prototypeInfoLine = resultsLines[15];
+                    } else {
+                        prototypeInfoLine = resultsLines[13];
+                    }
+
+                    String[] prototypeInfo = prototypeInfoLine.split(":");
 
                     List<Map<String, String>> prototypes = new ArrayList<>();
-
-                    String[] prototypeInfo = resultsLines[13].split(":");
                     Map<String, String> prototypeMap = new HashMap<>();
                     prototypeMap.put("index", prototypeInfo[1].trim());
                     prototypeMap.put("classIdentity", prototypeInfo[1].trim());

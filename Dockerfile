@@ -29,6 +29,9 @@ RUN pip3 install numpy==1.20.0 \
 # Create MongoDB data directory
 RUN mkdir -p /data/db
 
+# Create a file to indicate that the application is running in a Docker container
+RUN touch /usr/src/app/RUNNING_IN_DOCKER
+
 # Copy the entire project into the container
 COPY . /usr/src/app/
 
