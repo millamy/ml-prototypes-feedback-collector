@@ -38,6 +38,10 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+bootJar {
+	archiveFileName = 'protopnet-0.0.1-SNAPSHOT.jar'
+}
+
 test {
 	useJUnitPlatform()
 	testLogging {
