@@ -17,56 +17,67 @@
             <div class="white-box-header"><a href="/home">Home</a></div>
             <div class="white-box-header"><a href="/about-us">About Us</a></div>
             <div class="white-box-header"><a href="/history">History</a></div>
+            <div class="white-box-header sign-out"><a href="/logout">Sign Out</a></div>
         </ul>
     </nav>
 </div>
 <div class="results-container">
-    <div class="analysis-box">
-        <h1 class="title">Analysis Results</h1>
-        <div th:if="${birdNames != null}">
-            <p class="image-info">Original Image Class: <span id="originalImageClass"
-                                                              th:text="${birdNames[originalImgclass - 1]}"></span></p>
-            <p class="image-info">Predicted Class: <span id="predictedImageClass"
-                                                         th:text="${birdNames[predictedClass]}"></span></p>
+    <div class="left-container">
+        <div id="analysis-results" class="analysis-box">
+            <h1 class="title">Analysis Results</h1>
+            <div th:if="${birdNames != null}">
+                <p class="image-info">Original Image Class: <span id="originalImageClass"
+                                                                  th:text="${birdNames[originalImgclass - 1]}"></span>
+                </p>
+                <p class="image-info">Predicted Class: <span id="predictedImageClass"
+                                                             th:text="${birdNames[predictedClass]}"></span></p>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="center-container">
-    <div class="white-box">
-        <h2>Top 10 Most Activated Prototypes</h2>
-        <div class="scrollable-table">
-            <table border="1">
-                <thead>
-                <tr>
-                    <th style="width:35%">Original Image</th>
-                    <th style="width:35%">Prototype Image</th>
-                    <th style="width:30%">Correctness</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="index : ${#numbers.sequence(1, 10)}">
-                    <td>
-                        <canvas class="originalImageCanvas" th:data-src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/prototype'}"></canvas>
-                    </td>
-                    <td>
-                        <canvas class="prototypeImageCanvas" th:data-src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}"></canvas>
-                    </td>
+    <div class="center-container">
+        <div id="white-results-box" class="white-box">
+            <h2>Top 10 Most Activated Prototypes</h2>
+            <div class="scrollable-table">
+                <table class="results-table" border="1">
+                    <thead>
+                    <tr>
+                        <th style="width:35%">Original Image</th>
+                        <th style="width:35%">Prototype Image</th>
+                        <th style="width:30%">Correctness</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="index : ${#numbers.sequence(1, 10)}">
+                        <td>
+                            <canvas class="originalImagePath"
+                                    th:data-src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/prototype'}"></canvas>
+                        </td>
+                        <td>
+                            <canvas class="prototypeImagePath"
+                                    th:data-src="@{'/results_images/' + ${imgdir} + '/' + ${index} + '/activated'}"></canvas>
+                        </td>
 
-                    <td>
-                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"/> Yes</label>
-                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/> No</label>
-                        <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk"/> I don't
-                            know</label>
-                        <button class="cropper-toggle hidden" th:attr="data-index=${index}" hidden>Select area</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                        <td>
+                            <div class="radio-group">
+                                <label><input type="radio" th:name="'correctness_' + ${index}" th:value="yes"/>
+                                    Yes</label>
+                                <label><input type="radio" th:name="'correctness_' + ${index}" th:value="no"/>
+                                    No</label>
+                                <label><input type="radio" th:name="'correctness_' + ${index}" th:value="idk"/> I don't
+                                    know</label>
+                                <button class="cropper-toggle hidden" th:attr="data-index=${index}" hidden>Select area
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    <div class="next-button">
-        <a class="action-button" href="#" onclick="saveFeedbackAndRedirect()">Save & Continue</a>
+        <div class="next-button">
+            <a class="action-button" href="#" onclick="saveFeedbackAndRedirect()">Save & Continue</a>
+        </div>
     </div>
 </div>
 
@@ -101,29 +112,31 @@
     }
 
     function addCorrectnessListeners() {
-
         var correctnessRadioButtons = document.querySelectorAll('input[name^="correctness_"]');
 
         correctnessRadioButtons.forEach(function (radio) {
             radio.addEventListener('change', function () {
                 var index = parseInt(this.name.replace('correctness_', '')) - 1;
                 toggleSelectAreaButton(index);
+
+                var radioGroup = this.parentElement.parentElement.parentElement.parentElement;
+                radioGroup.classList.remove('red-frame');
             });
         });
     }
 
     document.querySelectorAll('.cropper-toggle').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const index = this.getAttribute('data-index');
             const modal = document.getElementById('selectionModal');
             modal.style.display = 'block';
-            document.getElementById('leftButton').onclick = function() {
+            document.getElementById('leftButton').onclick = function () {
                 modal.style.display = 'none';
-                activateDrawing(document.querySelectorAll('.originalImageCanvas')[index], 'original');
+                activateDrawing(document.querySelectorAll('.originalImagePath')[index], 'original');
             };
-            document.getElementById('rightButton').onclick = function() {
+            document.getElementById('rightButton').onclick = function () {
                 modal.style.display = 'none';
-                activateDrawing(document.querySelectorAll('.prototypeImageCanvas')[index], 'prototype');
+                activateDrawing(document.querySelectorAll('.prototypeImagePath')[index], 'prototype');
             };
         });
     });
@@ -148,7 +161,7 @@
 
     var croppers = [];
 
-    window.onload = function() {
+    window.onload = function () {
         addCorrectnessListeners();
         loadImagesToCanvas();
         setupSelectAreaListeners();
@@ -169,17 +182,17 @@
 
     function setupSelectAreaListeners() {
         document.querySelectorAll('.cropper-toggle').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const index = this.getAttribute('data-index');
                 const modal = document.getElementById('selectionModal');
                 modal.style.display = 'block';
-                document.getElementById('leftButton').onclick = function() {
+                document.getElementById('leftButton').onclick = function () {
                     modal.style.display = 'none';
-                    activateDrawing(document.querySelectorAll('.originalImageCanvas')[index-1], 'original');
+                    activateDrawing(document.querySelectorAll('.originalImagePath')[index - 1], 'original');
                 };
-                document.getElementById('rightButton').onclick = function() {
+                document.getElementById('rightButton').onclick = function () {
                     modal.style.display = 'none';
-                    activateDrawing(document.querySelectorAll('.prototypeImageCanvas')[index-1], 'prototype');
+                    activateDrawing(document.querySelectorAll('.prototypeImagePath')[index - 1], 'prototype');
                 };
             });
         });
@@ -213,7 +226,7 @@
                 var feedbackData = {};
                 feedbackData['imageClass'] = document.getElementById("originalImageClass").innerText;
                 feedbackData['predictedImageClass'] = document.getElementById("predictedImageClass").innerText;
-                var thSrc = document.getElementsByClassName("originalImagePath")[index - 1].getAttribute("src");
+                var thSrc = document.getElementsByClassName("originalImagePath")[index - 1].getAttribute("data-src");
 
                 let parts = thSrc.split("/");
 
@@ -227,16 +240,14 @@
                 feedbackData['prototypeImagePath'] = imgdir + "/vgg19/001/100_0push0.7411.pth/most_activated_prototypes/top-" + pathIndex
                     + "_activated_prototype_self_act.png";
 
+                // Capture canvas image data
+                var originalCanvas = document.getElementsByClassName("originalImagePath")[index - 1];
+                var prototypeCanvas = document.getElementsByClassName("prototypeImagePath")[index - 1];
+
                 feedbackData['correctness'] = selectedValue.value;
 
-                if (croppers[index - 1]) {
-                    const selectionData = croppers[index - 1].getData();
-                    console.log(`Selection Data for image ${index}:`, selectionData);
-                    feedbackData['selectionX'] = selectionData.x;
-                    feedbackData['selectionY'] = selectionData.y;
-                    feedbackData['selectionWidth'] = selectionData.width;
-                    feedbackData['selectionHeight'] = selectionData.height;
-                }
+                feedbackData['originalImageData'] = originalCanvas.toDataURL();
+                feedbackData['prototypeImageData'] = prototypeCanvas.toDataURL();
 
                 feedbackDataArray.push(feedbackData);
             }
@@ -266,7 +277,6 @@
                         console.log('Received the following instead of valid JSON:', bodyText);
                     });
             });
-
     }
 
     function saveFeedbackAndRedirect() {
@@ -274,7 +284,7 @@
 
         // Loop through each set of radio buttons to check if any option is selected
         for (var index = 1; index <= 10; index++) {
-            var radioGroup = document.querySelector('input[name="correctness_' + index + '"]').parentElement.parentElement;
+            var radioGroup = document.querySelector('input[name="correctness_' + index + '"]').parentElement.parentElement.parentElement.parentElement;
             var selectedValue = document.querySelector('input[name="correctness_' + index + '"]:checked');
 
             // Remove any existing red frame class
@@ -321,7 +331,7 @@
             isDrawing = true;
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 2;
-            points = [{ x: e.offsetX, y: e.offsetY }];
+            points = [{x: e.offsetX, y: e.offsetY}];
             ctx.beginPath();
             ctx.moveTo(e.offsetX, e.offsetY);
         }
@@ -330,7 +340,7 @@
             if (!isDrawing) return;
             ctx.lineTo(e.offsetX, e.offsetY);
             ctx.stroke();
-            points.push({ x: e.offsetX, y: e.offsetY });
+            points.push({x: e.offsetX, y: e.offsetY});
         }
 
         function stopDrawing(e) {
@@ -347,6 +357,12 @@
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mousedown', clearCanvas);
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        addCorrectnessListeners();
+        loadImagesToCanvas();
+        setupSelectAreaListeners();
+    });
 
 </script>
 

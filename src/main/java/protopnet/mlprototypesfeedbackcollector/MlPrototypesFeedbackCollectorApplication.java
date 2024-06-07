@@ -7,14 +7,21 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+/**
+ * Main application class for the ML Prototypes Feedback Collector application.
+ */
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableJpaRepositories("protopnet.mlprototypesfeedbackcollector")
-@ComponentScan(basePackages = { "protopnet.mlprototypesfeedbackcollector.model" })
+@ComponentScan(basePackages = {"protopnet.mlprototypesfeedbackcollector.model"})
 @EntityScan("protopnet.mlprototypesfeedbackcollector.model")
 public class MlPrototypesFeedbackCollectorApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MlPrototypesFeedbackCollectorApplication.class, args);
-	}
-
+    /**
+     * Main method to run the Spring Boot application.
+     *
+     * @param args the command line arguments.
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(MlPrototypesFeedbackCollectorApplication.class, args);
+    }
 }
