@@ -1,24 +1,133 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8"/>
     <title>Bird Selection</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/style.css"/>
 </head>
 <body>
-    <h2>Select a Bird Kind</h2>
-    <form action="/selected-pictures" method="post">
-        <label for="birdKind">Bird Kind:</label>
-        <select id="birdKind" name="birdKind">
-            <!-- Thymeleaf iteration -->
-            <option th:each="birdName : ${birdNames}" th:value="${birdName}" th:text="${birdName}"></option>
-        </select>
-        <br/>
-        <label for="selectedPictures">Select Pictures:</label>
-        <select id="selectedPictures" name="selectedPictures" multiple="multiple">
-        </select>
-        <br/>
-        <button type="submit">Submit</button>
-    </form>
+
+<div class="header">
+    <nav>
+        <ul>
+            <div class="white-box-header"><a href="/home">Home</a></div>
+            <div class="white-box-header"><a href="/about-us">About Us</a></div>
+            <div class="white-box-header"><a href="/history">History</a></div>
+            <div class="white-box-header sign-out"><a href="/logout">Sign Out</a></div>
+        </ul>
+    </nav>
+</div>
+
+<div class="content-container">
+    <div class="white-box">
+        <h2>Please select a bird kind</h2>
+        <form action="/selected-pictures" method="post">
+            <label for="birdKind">Available bird kinds:</label>
+            <select id="birdKind" name="birdKind">
+                <!-- Thymeleaf iteration -->
+                <option th:each="birdName : ${birdNames}" th:value="${birdName}" th:text="${birdName}"></option>
+            </select>
+            <br/>
+            <div id="birdsImagesGrid" class="image-grid"></div>
+            <input type="hidden" id="selectedImageUrl" name="selectedImageUrl" value="">
+            <div class="button-container">
+                <button id="submit-button" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const birdToFolder = /*[[${nameToFolderMap}]]*/ {};
+    /*]]>*/
+</script>
+
+<script>
+    let selectedImages = [];
+const maxSelectedImages = 3;
+
+function loadBirdImages(birdName) {
+    let folderName = birdToFolder[birdName];
+    fetch(`/images/${folderName}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Received data:', data);
+
+            const imageGrid = document.getElementById('birdsImagesGrid');
+            imageGrid.innerHTML = '';
+
+            data.forEach(record => {
+                const blob = base64ToBlob(record.imageData);
+                const imgUrl = URL.createObjectURL(blob);
+
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = 'Bird Image';
+                img.classList.add('image-item');
+
+                img.addEventListener('click', () => {
+                    if (selectedImages.includes(record.folderPath)) {
+                        console.log('Removing from selectedImages:', record.folderPath);
+        
+                        img.classList.remove('selected');
+                        selectedImages = selectedImages.filter(selected => selected !== record.folderPath);
+                    } else {
+                        console.log('Adding to selectedImages:', record.folderPath);
+        
+                        if (selectedImages.length < maxSelectedImages) {
+                            img.classList.add('selected');
+                            selectedImages.push(record.folderPath);
+                        } else {
+                            alert('You can only select up to 3 bird pictures.');
+                        }
+                    }
+                    updateSelectedImagesInput();
+                });
+
+                imageGrid.appendChild(img);
+            });
+        })
+        .catch(error => console.error('Error fetching images:', error));
+}
+
+function updateSelectedImagesInput() {
+    console.log('Selected images:', selectedImages);
+
+    const selectedUrls = selectedImages.map(imagePath => `/images/${imagePath}`);
+    document.getElementById('selectedImageUrl').value = selectedUrls.join(';');
+    console.log('Updated selectedImageUrl:', document.getElementById('selectedImageUrl').value);
+}
+
+    function base64ToBlob(base64Data) {
+        const sliceSize = 512;
+        const byteCharacters = atob(base64Data);
+        const byteArrays = [];
+
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+
+        return new Blob(byteArrays, { type: 'image/jpeg' });
+    }
+
+    document.getElementById('birdKind').addEventListener('change', function () {
+        loadBirdImages(this.value);
+    });
+
+    window.onload = () => {
+        const initialBirdName = document.getElementById('birdKind').value;
+        loadBirdImages(initialBirdName);
+    }
+</script>
 </body>
 </html>

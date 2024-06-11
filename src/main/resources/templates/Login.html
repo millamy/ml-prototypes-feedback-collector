@@ -1,0 +1,29 @@
+<!-- src/main/resources/templates/login.html -->
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Login Page</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Login</h2>
+    <form action="/login" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required/>
+        <br/>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required/>
+        <br/>
+        <div class="button-container">
+            <button type="submit">Login</button>
+        </div>
+    </form>
+    <p id="login-text">Don't have an account? <a href="/register">Sign up</a></p>
+</div>
+</body>
+</html>
